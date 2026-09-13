@@ -73,3 +73,9 @@ terbaru dulu dan dibatasi sampai tanggal hari ini (belum tayang tidak
 tampil; batas Tahun eksplisit tetap menang). Satu toggle, kriteria
 berbeda per Type.
 _Avoid_: Film lokal (untuk filter)
+
+**Orang**:
+Individu di industri film — pemeran atau sutradara. Tampil sebagai nama
+pemain di halaman detail; punya halaman sendiri berisi biografi dan
+filmografi (Item yang pernah dibintangi, diurut skor TMDb).
+_Avoid_: Aktor (terlalu sempit), person, profil

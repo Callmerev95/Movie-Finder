@@ -39,6 +39,18 @@ export interface CastMember {
   profilePath: string | null
 }
 
+export interface PersonDetail {
+  id: number
+  name: string
+  biography: string
+  profilePath: string | null
+  knownFor: string | null
+  birthday: string | null
+  deathday: string | null
+  placeOfBirth: string | null
+  credits: Item[]
+}
+
 export interface Provider {
   id: number
   name: string

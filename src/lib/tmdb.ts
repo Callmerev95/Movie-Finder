@@ -1,5 +1,5 @@
 import { get, TmdbError } from './tmdb-fetch'
-import type { DetailData, Genre, Item, Paged, Filters, MediaType, Provider, ProviderSections } from './types'
+import type { DetailData, Genre, Item, Paged, Filters, MediaType, PersonDetail, Provider, ProviderSections } from './types'
 
 interface RawMultiResult {
   id: number
@@ -248,6 +248,53 @@ export function detail(type: MediaType, id: number): Promise<DetailData> {
     append_to_response: 'videos,credits,watch/providers',
     include_video_language: 'id,en,null',
   }).then((r) => normalizeDetail(r, type))
+}
+
+interface RawPerson {
+  id: number
+  name?: string
+  biography?: string
+  profile_path?: string | null
+  known_for_department?: string
+  birthday?: string | null
+  deathday?: string | null
+  place_of_birth?: string | null
+  combined_credits?: { cast?: (RawMultiResult & { character?: string })[] }
+}
+
+// filmografi: popularitas TMDb tinggi dulu, cap 24, duplikat id+type dibuang
+export function normalizePersonCredits(raw: RawPerson): Item[] {
+  const items = (raw.combined_credits?.cast ?? [])
+    .map((r) => normalizeItem(r))
+    .filter((i): i is Item => i !== null)
+  const seen = new Set<string>()
+  return items
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+    .filter((i) => {
+      const k = `${i.type}-${i.tmdbId}`
+      if (seen.has(k)) return false
+      seen.add(k)
+      return true
+    })
+    .slice(0, 24)
+}
+
+export function normalizePerson(raw: RawPerson): PersonDetail {
+  return {
+    id: raw.id,
+    name: raw.name ?? 'Tanpa nama',
+    biography: raw.biography ?? '',
+    profilePath: raw.profile_path ?? null,
+    knownFor: raw.known_for_department ?? null,
+    birthday: raw.birthday ?? null,
+    deathday: raw.deathday ?? null,
+    placeOfBirth: raw.place_of_birth ?? null,
+    credits: normalizePersonCredits(raw),
+  }
+}
+
+export function person(id: number): Promise<PersonDetail> {
+  return get<RawPerson>(`/person/${id}`, { append_to_response: 'combined_credits' }).then(normalizePerson)
 }
 
 export { TmdbError }

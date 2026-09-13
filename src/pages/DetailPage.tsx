@@ -258,7 +258,12 @@ export default function DetailPage() {
               <ul className="mt-2 flex flex-wrap gap-x-6 gap-y-2">
                 {data.cast.map((c) => (
                   <li key={c.id} className="text-sm">
-                    <span className="text-card-foreground/90">{c.name}</span>
+                    <Link
+                      to={`/person/${c.id}`}
+                      className="cursor-pointer text-card-foreground/90 underline-offset-4 hover:underline focus-visible:ring-3 focus-visible:rounded-sm focus-visible:ring-ring/50 outline-none"
+                    >
+                      {c.name}
+                    </Link>
                     {c.character && <span className="text-muted-foreground"> sebagai {c.character}</span>}
                   </li>
                 ))}

@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Toaster } from '@/components/ui/toast'
 import SearchPage from './pages/SearchPage'
 import DetailPage from './pages/DetailPage'
+import PersonPage from './pages/PersonPage'
 import WatchlistPage from './pages/WatchlistPage'
 import { WatchlistProvider, useWatchlist } from '@/lib/useWatchlist'
 
@@ -55,6 +56,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<SearchPage />} />
           <Route path="/detail/:type/:id" element={<DetailPage />} />
+          <Route path="/person/:id" element={<PersonPage />} />
           <Route path="/watchlist" element={<WatchlistPage />} />
         </Routes>
       </main>

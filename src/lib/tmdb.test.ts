@@ -158,6 +158,69 @@ describe('trending', () => {
   })
 })
 
+describe('normalizePerson', () => {
+  const raw = {
+    id: 5292,
+    name: 'Leonardo DiCaprio',
+    biography: 'Seorang aktor Amerika.',
+    profile_path: '/l.jpg',
+    known_for_department: 'Acting',
+    birthday: '1974-11-11',
+    deathday: null,
+    place_of_birth: 'Los Angeles, California, USA',
+    combined_credits: {
+      cast: [
+        { id: 27205, media_type: 'movie', title: 'Inception', release_date: '2010-07-15', vote_average: 8.4 },
+        { id: 27205, media_type: 'movie', title: 'Inception', release_date: '2010-07-15', vote_average: 8.4 },
+        { id: 634649, media_type: 'movie', title: 'Joker', release_date: '2019-10-02', vote_average: 8.2 },
+        { id: 1399, media_type: 'tv', name: 'Breaking Bad', first_air_date: '2008-01-20', vote_average: 8.9 },
+        { id: 1, media_type: 'person', name: 'X' },
+        { id: 615, media_type: 'movie', title: 'Titanic', release_date: '1997-11-01', vote_average: 0 },
+      ],
+    },
+  }
+
+  it('filmografi: skor tinggi dulu, duplikat dibuang, person dibuang, cap 24', async () => {
+    const { normalizePerson } = await import('./tmdb')
+    const p = normalizePerson(raw)
+    expect(p.credits.map((i) => i.title)).toEqual(['Breaking Bad', 'Inception', 'Joker', 'Titanic'])
+    expect(p.name).toBe('Leonardo DiCaprio')
+    expect(p.knownFor).toBe('Acting')
+  })
+
+  it('cap 24 item', async () => {
+    const { normalizePerson } = await import('./tmdb')
+    const many = {
+      ...raw,
+      combined_credits: {
+        cast: Array.from({ length: 40 }, (_, i) => ({
+          id: i,
+          media_type: 'movie',
+          title: `F${i}`,
+          vote_average: 5,
+        })),
+      },
+    }
+    expect(normalizePerson(many).credits).toHaveLength(24)
+  })
+
+  it('combined_credits kosong → credits kosong, field null aman', async () => {
+    const { normalizePerson } = await import('./tmdb')
+    const p = normalizePerson({ id: 1, name: 'X' })
+    expect(p.credits).toEqual([])
+    expect(p.biography).toBe('')
+    expect(p.knownFor).toBeNull()
+  })
+})
+
+describe('person', () => {
+  it('endpoint /person/{id} + append combined_credits', async () => {
+    const { person } = await import('./tmdb')
+    await person(5292)
+    expect(trendingCalls.at(-1)).toEqual({ path: '/person/5292', params: { append_to_response: 'combined_credits' } })
+  })
+})
+
 describe('normalizeProviders', () => {
   it('map ID sections, buang section kosong via null bila semua kosong', async () => {
     const { normalizeProviders } = await import('./tmdb')
