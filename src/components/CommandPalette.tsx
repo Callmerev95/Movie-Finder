@@ -4,6 +4,7 @@ import { Clapperboard, CornerDownLeft, Loader2, Search, Bookmark } from 'lucide-
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { imageUrl, searchByTitle } from '@/lib/tmdb'
+import { useLanguage } from '@/lib/useLanguage'
 import type { Item } from '@/lib/types'
 
 const DEBOUNCE_MS = 300
@@ -17,6 +18,7 @@ interface Action {
 }
 
 export function CommandPalette() {
+  const { t } = useLanguage()
   const [open, setOpen] = useState(false)
   const [text, setText] = useState('')
   const [loading, setLoading] = useState(false)
@@ -69,8 +71,8 @@ export function CommandPalette() {
   const navActions: Action[] = [
     {
       id: 'home',
-      label: 'Beranda',
-      hint: 'Trending minggu ini',
+      label: t('palette.home'),
+      hint: t('palette.homeHint'),
       icon: <Clapperboard className="size-4" aria-hidden="true" />,
       run: () => {
         close()
@@ -79,8 +81,8 @@ export function CommandPalette() {
     },
     {
       id: 'watchlist',
-      label: 'Watchlist',
-      hint: 'Daftar tontonan tersimpan',
+      label: t('nav.watchlist'),
+      hint: t('palette.watchlistHint'),
       icon: <Bookmark className="size-4" aria-hidden="true" />,
       run: () => {
         close()
@@ -142,8 +144,8 @@ export function CommandPalette() {
             ref={inputRef}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Cari judul, atau pilih halaman…"
-            aria-label="Perintah cepat — cari judul atau navigasi"
+            placeholder={t('palette.placeholder')}
+            aria-label={t('palette.label')}
             className="h-11 border-0 bg-transparent ps-0 focus-visible:ring-0"
           />
           <kbd className="hidden shrink-0 rounded border border-border bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground sm:block">
@@ -151,17 +153,17 @@ export function CommandPalette() {
           </kbd>
         </div>
 
-        <div role="listbox" aria-label="Hasil perintah cepat" className="max-h-80 overflow-y-auto p-2">
+        <div role="listbox" aria-label={t('palette.list')} className="max-h-80 overflow-y-auto p-2">
           {loading && (
             <div className="flex items-center gap-2 px-2 py-6 text-sm text-muted-foreground">
               <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-              Mencari…
+              {t('palette.loading')}
             </div>
           )}
 
           {!loading && showNav && (
             <p className="px-2 pb-1 pt-2 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-              Navigasi
+              {t('palette.navSection')}
             </p>
           )}
           {!loading &&
@@ -190,7 +192,7 @@ export function CommandPalette() {
 
           {!loading && !showNav && items.length === 0 && (
             <p className="px-2 py-6 text-sm text-muted-foreground">
-              Tidak ada hasil untuk “{text.trim()}”.
+              {t('palette.noResults', { q: text.trim() })}
             </p>
           )}
           {!loading &&
@@ -230,9 +232,9 @@ export function CommandPalette() {
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm">{item.title}</span>
                       <span className="block text-xs text-muted-foreground">
-                        {item.type === 'movie' ? 'Film' : 'Serial'}
+                        {item.type === 'movie' ? t('common.movie') : t('common.tv')}
                         {item.year ? ` · ${item.year}` : ''}
-                        {item.score ? ` · Skor TMDb ${item.score.toFixed(1)}` : ''}
+                        {item.score ? ` · ${t('common.score')} ${item.score.toFixed(1)}` : ''}
                       </span>
                     </span>
                     {active === idx && <CornerDownLeft className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />}
@@ -243,12 +245,12 @@ export function CommandPalette() {
 
         <div className="border-t border-border px-3 py-2 text-[10px] text-muted-foreground">
           <span className="inline-flex items-center gap-1">
-            <CornerDownLeft className="size-3" aria-hidden="true" /> buka
+            <CornerDownLeft className="size-3" aria-hidden="true" /> {t('palette.footerOpen')}
           </span>
           <span className="mx-2">·</span>
-          ↑↓ navigasi
+          {t('palette.footerNav')}
           <span className="mx-2">·</span>
-          Enter dengan teks → cari semua
+          {t('palette.footerEnter')}
         </div>
       </DialogContent>
     </Dialog>

@@ -3,6 +3,11 @@
 Aplikasi pencarian film & serial via TMDb dengan watchlist dan rating pribadi
 yang tersimpan lokal di browser.
 
+> Catatan i18n: glossary ini kanonik dalam Bahasa Indonesia. UI Inggris (EN)
+> memetakan ke konsep yang sama — mis. Watchlist tetap "Watchlist", Rating
+> tetap "Rating", Skor TMDb menjadi "TMDb score". Istilah di bawah adalah
+> acuan makna, bukan teks UI harfiah.
+
 ## Language
 
 **Watchlist**:

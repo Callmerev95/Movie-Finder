@@ -169,11 +169,11 @@ export function discover(filters: Filters, type: MediaType, page = 1): Promise<P
   return get<RawPaged>(`/discover/${type}`, buildDiscoverParams(filters, type, page)).then((r) => pagedOf(r, type))
 }
 
-export function providerList(type: MediaType): Promise<Provider[]> {
+export function providerList(type: MediaType, locale = 'id-ID'): Promise<Provider[]> {
   return get<RawProviderList>(`/watch/providers/${type}`, { watch_region: 'ID' }).then((r) =>
     r.results
       .map((p) => ({ id: p.provider_id, name: p.provider_name, logoPath: p.logo_path ?? null }))
-      .sort((a, b) => a.name.localeCompare(b.name, 'id-ID')),
+      .sort((a, b) => a.name.localeCompare(b.name, locale)),
   )
 }
 

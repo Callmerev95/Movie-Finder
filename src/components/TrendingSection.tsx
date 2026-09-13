@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react'
 import { ResultCard } from '@/components/ResultCard'
 import { Section } from '@/components/Section'
 import { trending, TmdbError } from '@/lib/tmdb'
+import { useLanguage } from '@/lib/useLanguage'
 import type { Item } from '@/lib/types'
 
 export function TrendingSection({ adult }: { adult: boolean }) {
+  const { t } = useLanguage()
   const [items, setItems] = useState<Item[] | null>(null)
   const [error, setError] = useState(false)
 
@@ -27,8 +29,8 @@ export function TrendingSection({ adult }: { adult: boolean }) {
 
   return (
     <Section
-      title="Trending Minggu Ini"
-      description="Film dan serial paling ramai sepanjang minggu."
+      title={t('trending.title')}
+      description={t('trending.desc')}
       className="mt-10"
     >
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">

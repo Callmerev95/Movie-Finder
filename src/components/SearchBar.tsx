@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { Search as SearchIcon, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { useLanguage } from '@/lib/useLanguage'
 
 export function SearchBar({ initial, onSubmit }: { initial: string; onSubmit: (q: string) => void }) {
+  const { t } = useLanguage()
   const [text, setText] = useState(initial)
   const prevInitial = useRef(initial)
 
@@ -29,8 +31,8 @@ export function SearchBar({ initial, onSubmit }: { initial: string; onSubmit: (q
           type="search"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Cari judul film atau serial…"
-          aria-label="Cari judul film atau serial"
+          placeholder={t('searchbar.placeholder')}
+          aria-label={t('searchbar.label')}
           className="ps-9 pe-12"
         />
         {!text && (
@@ -46,7 +48,7 @@ export function SearchBar({ initial, onSubmit }: { initial: string; onSubmit: (q
         type="button"
         variant="ghost"
         size="icon-sm"
-        aria-label="Bersihkan pencarian"
+        aria-label={t('searchbar.clear')}
         disabled={!text}
         className={!text ? 'invisible' : ''}
         onClick={() => {

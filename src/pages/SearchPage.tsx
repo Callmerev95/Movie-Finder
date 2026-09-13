@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Clapperboard, RotateCcw } from 'lucide-react'
 import { discover, searchByTitle, TmdbError } from '@/lib/tmdb'
 import { parseUrlState, serializeUrlState } from '@/lib/url-state'
+import { useLanguage } from '@/lib/useLanguage'
 import { toastInfo } from '@/lib/toast'
 import type { Item, MediaType } from '@/lib/types'
 
@@ -15,6 +16,7 @@ const PAGE = 20
 const INITIAL = 24
 
 export default function SearchPage() {
+  const { t, locale } = useLanguage()
   const [, setParams] = useSearchParams()
   const { search } = useLocation()
   // state di-memo key string URL: parseUrlState bikin objek baru tiap panggil,
@@ -57,12 +59,12 @@ export default function SearchPage() {
         }
       } catch (e) {
         if (signal.aborted) return
-        setError(e instanceof TmdbError ? e.message : 'Terjadi kesalahan tak terduga.')
+        setError(e instanceof TmdbError ? e.message : t('search.error'))
       } finally {
         if (!signal.aborted) setLoading(false)
       }
     },
-    [mode, query, type, filters],
+    [mode, query, type, filters, t],
   )
 
   useEffect(() => {
@@ -87,7 +89,7 @@ export default function SearchPage() {
       setVisible((v) => v + PAGE)
       pagesLoaded.current = next
     } catch (e) {
-      setError(e instanceof TmdbError ? e.message : 'Gagal memuat halaman berikutnya.')
+      setError(e instanceof TmdbError ? e.message : t('search.errorMore'))
     } finally {
       setLoadingMore(false)
     }
@@ -115,10 +117,10 @@ export default function SearchPage() {
     <div className="pt-4">
       <SearchBar
         initial={query}
-        onSubmit={(q) => {
+          onSubmit={(q) => {
           const cleared = submitSearch(q)
           if (cleared) {
-            toastInfo('Filter dihapus', 'Pencarian judul tidak mendukung genre/tahun.')
+            toastInfo(t('search.filterCleared'), t('search.filterClearedDesc'))
           }
         }}
       />
@@ -132,7 +134,7 @@ export default function SearchPage() {
           <p className="text-sm text-muted-foreground">{error}</p>
           <Button variant="outline" size="sm" onClick={() => void fetchFirst(new AbortController().signal)}>
             <RotateCcw className="size-3.5" aria-hidden="true" />
-            Coba lagi
+            {t('search.retry')}
           </Button>
         </div>
       )}
@@ -155,7 +157,7 @@ export default function SearchPage() {
         <div className="mt-16 flex flex-col items-center gap-3 text-center">
           <Clapperboard className="size-10 text-muted-foreground/50" aria-hidden="true" />
           <p className="text-sm text-muted-foreground">
-            Tidak ada hasil{query ? ` untuk "${query}"` : ''}. Coba judul lain atau hapus filter.
+            {query ? t('search.emptyQ', { q: query }) : t('search.empty')}
           </p>
         </div>
       )}
@@ -163,7 +165,7 @@ export default function SearchPage() {
       {items.length > 0 && (
         <>
           <p className="mt-6 text-xs text-muted-foreground tabular-nums" aria-live="polite">
-            {total.toLocaleString('id-ID')} hasil
+            {t('search.results', { total: total.toLocaleString(locale) })}
           </p>
           <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             {items.slice(0, visible).map((item) => (
@@ -173,7 +175,7 @@ export default function SearchPage() {
           {items.length < total && (
             <div className="mt-8 flex justify-center">
               <Button variant="outline" onClick={() => void loadMore()} disabled={loadingMore}>
-                {loadingMore ? 'Memuat…' : 'Muat lebih banyak'}
+                {loadingMore ? t('search.loadingMore') : t('search.loadMore')}
               </Button>
             </div>
           )}

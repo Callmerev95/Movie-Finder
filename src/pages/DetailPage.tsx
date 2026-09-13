@@ -8,11 +8,13 @@ import { ResultCard } from '@/components/ResultCard'
 import { Section } from '@/components/Section'
 import { detail, imageUrl, providerUrl, recommendations, TmdbError } from '@/lib/tmdb'
 import { detailInfoRows } from '@/lib/detail-info'
+import { useLanguage } from '@/lib/useLanguage'
 import type { DetailData, Item } from '@/lib/types'
 import { useWatchlist } from '@/lib/useWatchlist'
 import { toastSuccess, toastWithUndo } from '@/lib/toast'
 
 export default function DetailPage() {
+  const { t, locale } = useLanguage()
   const { type, id } = useParams()
   const [data, setData] = useState<DetailData | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -31,13 +33,13 @@ export default function DetailPage() {
     void recommendations(type, n).then(setRelated).catch(() => setRelated([]))
     detail(type, n)
       .then(setData)
-      .catch((e) => setError(e instanceof TmdbError ? e.message : 'Gagal memuat detail.'))
+      .catch((e) => setError(e instanceof TmdbError ? e.message : t('detail.error')))
       .finally(() => setLoading(false))
-  }, [type, id])
+  }, [type, id, t])
 
   if (loading) {
     return (
-      <div className="pt-6" aria-busy="true" aria-label="Memuat detail">
+      <div className="pt-6" aria-busy="true" aria-label={t('detail.loading')}>
         <div className="h-64 w-full rounded-lg bg-muted" />
         <div className="mt-4 h-8 w-2/3 rounded bg-muted" />
         <div className="mt-3 h-4 w-1/2 rounded bg-muted" />
@@ -48,9 +50,9 @@ export default function DetailPage() {
   if (error || !data) {
     return (
       <div role="alert" className="mt-16 flex flex-col items-center gap-3 text-center">
-        <p className="text-sm text-muted-foreground">{error ?? 'Item tidak ditemukan.'}</p>
+        <p className="text-sm text-muted-foreground">{error ?? t('detail.notFound')}</p>
         <Button variant="outline" size="sm" render={<Link to="/" />}>
-          Kembali ke pencarian
+          {t('detail.backToSearch')}
         </Button>
       </div>
     )
@@ -66,12 +68,12 @@ export default function DetailPage() {
   const toggleSave = () => {
     if (saved) {
       wl.remove(key)
-      toastWithUndo('Dihapus dari watchlist', data.title, () => {
+      toastWithUndo(t('common.toastRemoved'), data.title, () => {
         if (entry) wl.restore(entry)
       })
     } else {
       wl.add(asItem)
-      toastSuccess('Ditambahkan ke watchlist', data.title)
+      toastSuccess(t('common.toastAdded'), data.title)
     }
   }
 
@@ -104,7 +106,7 @@ export default function DetailPage() {
 
       <Button variant="ghost" size="sm" className="-ms-2" render={<Link to="/" />}>
         <ArrowLeft className="size-4" aria-hidden="true" />
-        Kembali
+        {t('detail.back')}
       </Button>
 
       <div className="mt-4 flex animate-in fade-in slide-in-from-bottom-2 flex-col gap-6 duration-300 ease-out motion-reduce:animate-none sm:flex-row">
@@ -112,19 +114,19 @@ export default function DetailPage() {
           {poster ? (
             <img
               src={poster}
-              alt={`Poster ${data.title}`}
+              alt={t('common.poster', { title: data.title })}
               className="w-full rounded-lg border border-border object-cover"
             />
           ) : (
             <div className="flex aspect-2/3 w-full items-center justify-center rounded-lg bg-muted text-xs text-muted-foreground">
-              Tanpa poster
+              {t('common.noPoster')}
             </div>
           )}
         </div>
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <Badge variant="outline">{data.type === 'movie' ? 'Film' : 'Serial'}</Badge>
+            <Badge variant="outline">{data.type === 'movie' ? t('common.movie') : t('common.tv')}</Badge>
             {data.genres.slice(0, 3).map((g) => (
               <Badge key={g.id} variant="secondary" className="hidden sm:inline-flex">
                 {g.name}
@@ -145,23 +147,25 @@ export default function DetailPage() {
             {data.type === 'movie' && data.runtime !== null && (
               <span className="flex items-center gap-1 tabular-nums">
                 <Clock className="size-3.5" aria-hidden="true" />
-                {Math.floor(data.runtime / 60)}j {data.runtime % 60}m
+                {t('detail.runtime', { h: Math.floor(data.runtime / 60), m: data.runtime % 60 })}
               </span>
             )}
             {data.type === 'tv' && data.seasons !== null && (
-              <span className="tabular-nums">{data.seasons} season</span>
+              <span className="tabular-nums">
+                {data.seasons === 1 ? t('detail.seasonsOne') : t('detail.seasonsMany', { n: data.seasons })}
+              </span>
             )}
             {data.score !== null && (
               <span className="flex items-center gap-1 tabular-nums">
                 <Star className="size-3.5 fill-primary text-primary" aria-hidden="true" />
-                {data.score.toFixed(1)} Skor TMDb
+                {data.score.toFixed(1)} {t('common.score')}
               </span>
             )}
           </p>
 
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <Button variant={saved ? 'secondary' : 'default'} onClick={toggleSave}>
-              {saved ? 'Hapus dari watchlist' : 'Simpan ke watchlist'}
+              {saved ? t('common.unsave') : t('common.save')}
             </Button>
             {saved && (
               <button
@@ -178,22 +182,22 @@ export default function DetailPage() {
                 }
               >
                 <Check className="size-3" aria-hidden="true" />
-                {entry?.watched ? 'Sudah ditonton' : 'Tandai ditonton'}
+                {entry?.watched ? t('common.watched') : t('common.markWatched')}
               </button>
             )}
-            <Stars value={entry?.rating ?? null} onChange={rate} label={`Rating ${data.title}`} />
+            <Stars value={entry?.rating ?? null} onChange={rate} label={t('common.ratingOf', { title: data.title })} />
           </div>
 
           {data.overview && (
-            <Section title="Sinopsis">
+            <Section title={t('detail.sinopsis')}>
               <p className="max-w-prose text-sm leading-relaxed text-card-foreground/90">{data.overview}</p>
             </Section>
           )}
 
           {(() => {
-            const rows = detailInfoRows(data)
+            const rows = detailInfoRows(data, t, locale)
             return rows.length > 0 ? (
-              <Section title="Informasi" description="Fakta teknis dan detail produksi." divider className="mt-10">
+              <Section title={t('detail.info')} description={t('detail.infoDesc')} divider className="mt-10">
                 <dl className="flex flex-col gap-2">
                   {rows.map(([label, value]) => (
                     <div key={label} className="flex flex-wrap gap-x-3">
@@ -209,8 +213,8 @@ export default function DetailPage() {
                     rel="noopener noreferrer"
                     className="mt-3 inline-flex items-center gap-1 text-xs text-primary underline-offset-4 hover:underline"
                   >
-                    Lihat di IMDb
-                    <span className="sr-only">buka di tab baru</span>
+                    {t('detail.imdb')}
+                    <span className="sr-only">{t('detail.newTab')}</span>
                     <ExternalLink className="size-3" aria-hidden="true" />
                   </a>
                 )}
@@ -219,13 +223,13 @@ export default function DetailPage() {
           })()}
 
           {data.providers && (
-            <Section title="Tempat menonton" description="Ketersediaan streaming di Indonesia." divider className="mt-10">
+            <Section title={t('detail.providers')} description={t('detail.providersDesc')} divider className="mt-10">
               <dl className="flex flex-col gap-3">
                 {(
                   [
-                    ['Langganan', data.providers.flatrate],
-                    ['Sewa', data.providers.rent],
-                    ['Beli', data.providers.buy],
+                    [t('detail.flatrate'), data.providers.flatrate],
+                    [t('detail.rent'), data.providers.rent],
+                    [t('detail.buy'), data.providers.buy],
                   ] as const
                 ).map(
                   ([label, list]) =>
@@ -241,7 +245,7 @@ export default function DetailPage() {
                                 href={href}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                aria-label={`Buka ${p.name} di tab baru`}
+                                aria-label={t('detail.providerOpen', { name: p.name })}
                                 className="flex cursor-pointer items-center gap-2 rounded-md border border-border/60 bg-card/80 py-1 pe-2.5 ps-1.5 text-xs text-card-foreground outline-none transition-colors hover:border-foreground/20 focus-visible:ring-3 focus-visible:ring-ring/50"
                               >
                                 {p.logoPath ? (
@@ -267,11 +271,11 @@ export default function DetailPage() {
           )}
 
           {data.trailerKey && (
-            <Section title="Trailer" description={`Cuplikan resmi ${data.title}.`} divider className="mt-10">
+            <Section title={t('detail.trailer')} description={t('detail.trailerDesc', { title: data.title })} divider className="mt-10">
               <div className="aspect-video w-full max-w-xl overflow-hidden rounded-lg border border-border">
                 <iframe
                   src={`https://www.youtube-nocookie.com/embed/${data.trailerKey}`}
-                  title={`Trailer ${data.title}`}
+                  title={t('detail.trailerTitle', { title: data.title })}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   className="size-full"
@@ -281,7 +285,7 @@ export default function DetailPage() {
           )}
 
           {data.cast.length > 0 && (
-            <Section title="Pemain utama" description={`Pemeran dalam ${data.title}.`} divider className="mt-10">
+            <Section title={t('detail.cast')} description={t('detail.castDesc', { title: data.title })} divider className="mt-10">
               <ul className="flex flex-wrap gap-4">
                 {data.cast.map((c) => (
                   <li key={c.id}>
@@ -292,7 +296,7 @@ export default function DetailPage() {
                       {c.profilePath ? (
                         <img
                           src={imageUrl(c.profilePath, 'w185') ?? ''}
-                          alt={`Foto ${c.name}`}
+                          alt={t('detail.photoAlt', { name: c.name })}
                           width={96}
                           height={144}
                           loading="lazy"
@@ -301,7 +305,7 @@ export default function DetailPage() {
                         />
                       ) : (
                         <div className="flex aspect-3/4 w-full items-center justify-center rounded-lg bg-muted text-[10px] text-muted-foreground">
-                          Tanpa foto
+                          {t('detail.noPhoto')}
                         </div>
                       )}
                       <span className="text-xs font-medium leading-tight group-hover:underline underline-offset-2">
@@ -321,8 +325,8 @@ export default function DetailPage() {
 
           {related.length > 0 && (
             <Section
-              title="Mungkin kamu suka"
-              description="Film dan serial serupa berdasarkan skor TMDb."
+              title={t('detail.related')}
+              description={t('detail.relatedDesc')}
               divider
               className="mt-10"
             >

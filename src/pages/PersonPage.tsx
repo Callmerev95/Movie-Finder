@@ -5,16 +5,18 @@ import { Button } from '@/components/ui/button'
 import { ResultCard } from '@/components/ResultCard'
 import { Section } from '@/components/Section'
 import { person, TmdbError } from '@/lib/tmdb'
+import { useLanguage } from '@/lib/useLanguage'
 import type { PersonDetail } from '@/lib/types'
 
-function formatYears(p: PersonDetail): string | null {
+function formatYears(p: PersonDetail, present: string): string | null {
   if (!p.birthday) return null
   const from = new Date(p.birthday).getFullYear()
   const to = p.deathday ? new Date(p.deathday).getFullYear() : null
-  return to ? `${from}–${to}` : `${from}–kini`
+  return to ? `${from}–${to}` : `${from}–${present}`
 }
 
 export default function PersonPage() {
+  const { t } = useLanguage()
   const { id } = useParams()
   const [data, setData] = useState<PersonDetail | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -27,13 +29,13 @@ export default function PersonPage() {
     setError(null)
     person(n)
       .then(setData)
-      .catch((e) => setError(e instanceof TmdbError ? e.message : 'Gagal memuat profil.'))
+      .catch((e) => setError(e instanceof TmdbError ? e.message : t('person.error')))
       .finally(() => setLoading(false))
-  }, [id])
+  }, [id, t])
 
   if (loading) {
     return (
-      <div className="pt-6" aria-busy="true" aria-label="Memuat profil">
+      <div className="pt-6" aria-busy="true" aria-label={t('person.loading')}>
         <div className="h-40 w-32 rounded-lg bg-muted" />
         <div className="mt-4 h-8 w-2/3 rounded bg-muted" />
       </div>
@@ -43,22 +45,22 @@ export default function PersonPage() {
   if (error || !data) {
     return (
       <div role="alert" className="mt-16 flex flex-col items-center gap-3 text-center">
-        <p className="text-sm text-muted-foreground">{error ?? 'Orang tidak ditemukan.'}</p>
+        <p className="text-sm text-muted-foreground">{error ?? t('person.notFound')}</p>
         <Button variant="outline" size="sm" render={<Link to="/" />}>
-          Kembali ke pencarian
+          {t('person.backToSearch')}
         </Button>
       </div>
     )
   }
 
   const profile = data.profilePath ? `https://image.tmdb.org/t/p/w342${data.profilePath}` : null
-  const years = formatYears(data)
+  const years = formatYears(data, t('person.present'))
 
   return (
     <div>
       <Button variant="ghost" size="sm" className="-ms-2" render={<Link to="/" />}>
         <ArrowLeft className="size-4" aria-hidden="true" />
-        Kembali
+        {t('person.back')}
       </Button>
 
       <div className="mt-4 flex animate-in fade-in slide-in-from-bottom-2 flex-col gap-6 duration-300 ease-out motion-reduce:animate-none sm:flex-row">
@@ -66,12 +68,12 @@ export default function PersonPage() {
           {profile ? (
             <img
               src={profile}
-              alt={`Foto ${data.name}`}
+              alt={t('person.photoAlt', { name: data.name })}
               className="w-full rounded-lg border border-border object-cover"
             />
           ) : (
             <div className="flex aspect-3/4 w-full items-center justify-center rounded-lg bg-muted text-xs text-muted-foreground">
-              Tanpa foto
+              {t('person.noPhoto')}
             </div>
           )}
         </div>
@@ -97,7 +99,7 @@ export default function PersonPage() {
           )}
 
           {data.biography && (
-            <Section title="Biografi" className="mt-6">
+            <Section title={t('person.biography')} className="mt-6">
               <p className="max-w-prose whitespace-pre-line text-sm leading-relaxed text-card-foreground/90">
                 {data.biography}
               </p>
@@ -105,7 +107,7 @@ export default function PersonPage() {
           )}
 
           {data.credits.length > 0 && (
-            <Section title="Paling dikenal dari" description="Film dan serial dengan skor TMDb tertinggi." className="mt-6">
+            <Section title={t('person.credits')} description={t('person.creditsDesc')} className="mt-6">
               <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
                 {data.credits.map((item) => (
                   <li key={`${item.type}-${item.tmdbId}`}>

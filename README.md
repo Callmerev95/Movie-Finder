@@ -3,11 +3,13 @@
 Cari film & serial via TMDb, simpan watchlist, beri rating — semuanya lokal di
 browser. Tanpa akun, tanpa database, tanpa backend.
 
-![Stack](https://img.shields.io/badge/Vite-8-646CFF) ![React](https://img.shields.io/badge/React-19-61DAFB) ![TypeScript](https://img.shields.io/badge/TypeScript-7-3178C6) ![Tailwind](https://img.shields.io/badge/Tailwind-v4-38BDF8) ![Vitest](https://img.shields.io/badge/Vitest-57%2F57-6E9F18) ![CI](https://github.com/Callmerev95/Movie-Finder/actions/workflows/ci.yml/badge.svg)
+![Stack](https://img.shields.io/badge/Vite-8-646CFF) ![React](https://img.shields.io/badge/React-19-61DAFB) ![TypeScript](https://img.shields.io/badge/TypeScript-7-3178C6) ![Tailwind](https://img.shields.io/badge/Tailwind-v4-38BDF8) ![Vitest](https://img.shields.io/badge/Vitest-59%2F59-6E9F18) ![CI](https://github.com/Callmerev95/Movie-Finder/actions/workflows/ci.yml/badge.svg)
 
 - **Dua mode pencarian** — ketik judul (Search) atau pakai filter genre, tahun,
   provider streaming, dan Konten Indonesia (Discover). State pencarian tersimpan
   di URL: bisa dibagikan, tombol back bekerja.
+- **Multi-language ID/EN** — toggle di footer; konten TMDb + format
+  angka/tanggal ikut bahasa. Kamus custom tanpa dependency.
 - **Statistik watchlist** — dashboard agregasi lokal: total, status tontonan,
   distribusi rating, tren bulanan, top rating. Chart SVG custom tanpa dependency.
 - **PWA installable** — pasang ke home screen; app shell + poster ter-cache,
@@ -44,7 +46,7 @@ error "API key TMDb belum diatur".
 |---|---|
 | `npm run dev` | Dev server |
 | `npm run typecheck` | `tsc --noEmit` — wajib hijau |
-| `npm test` | Vitest — 57 test pure functions di `src/lib/` |
+| `npm test` | Vitest — 59 test pure functions di `src/lib/` |
 | `npm run build` | Build produksi |
 | `npm run preview` | Preview hasil build |
 
@@ -69,6 +71,7 @@ src/
 │  │                    TrendingSection, CommandPalette (Cmd+K)
 │  └─ ui/               komponen shadcn — regenerate via CLI, jangan edit manual
 ├─ lib/                 pure functions: tmdb, watchlist, url-state, format,
+│  │                    i18n (kamus id/en + completeness test),
 │  └─ *.test.ts         toast, useWatchlist (Context + localStorage)
 ├─ pages/               SearchPage, DetailPage, PersonPage, WatchlistPage,
 │                       StatsPage

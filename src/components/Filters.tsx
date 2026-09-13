@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { genreList, providerList } from '@/lib/tmdb'
+import { useLanguage } from '@/lib/useLanguage'
 import type { Filters, Genre, MediaType, Provider } from '@/lib/types'
 
 interface Props {
@@ -13,11 +14,13 @@ interface Props {
 }
 
 export function Filters({ type, filters, onChange }: Props) {
+  const { t, locale } = useLanguage()
   const [genres, setGenres] = useState<Genre[]>([])
   const [open, setOpen] = useState(true)
 
   useEffect(() => {
     // Q8a: genre ID beda per type — fetch per type, cache di tmdb-fetch
+    // nama genre ikut bahasa UI — refetch saat locale ganti
     let active = true
     genreList(type).then((g) => {
       if (active) setGenres(g)
@@ -27,7 +30,7 @@ export function Filters({ type, filters, onChange }: Props) {
     return () => {
       active = false
     }
-  }, [type])
+  }, [type, locale])
 
   const toggleGenre = (id: number) => {
     const next = filters.genres.includes(id) ? filters.genres.filter((g) => g !== id) : [...filters.genres, id]
@@ -41,7 +44,7 @@ export function Filters({ type, filters, onChange }: Props) {
   }
 
   return (
-    <section aria-label="Filter" className="flex flex-wrap items-center gap-x-3 gap-y-3">
+    <section aria-label={t('filters.section')} className="flex flex-wrap items-center gap-x-3 gap-y-3">
       <Button
         variant="outline"
         size="sm"
@@ -50,7 +53,7 @@ export function Filters({ type, filters, onChange }: Props) {
         onClick={() => setOpen((o) => !o)}
       >
         <Filter className="size-3.5" aria-hidden="true" />
-        Genre
+        {t('filters.genre')}
         {filters.genres.length > 0 && (
           <Badge variant="secondary" className="tabular-nums">
             {filters.genres.length}
@@ -59,7 +62,7 @@ export function Filters({ type, filters, onChange }: Props) {
       </Button>
 
       {open && (
-        <div id="genre-chips" className="flex flex-wrap gap-1.5" role="group" aria-label="Pilih genre">
+        <div id="genre-chips" className="flex flex-wrap gap-1.5" role="group" aria-label={t('filters.genreGroup')}>
         {genres.map((g) => {
           const on = filters.genres.includes(g.id)
           return (
@@ -79,39 +82,39 @@ export function Filters({ type, filters, onChange }: Props) {
             </button>
           )
         })}
-        {genres.length === 0 && <span className="text-xs text-muted-foreground">Memuat genre…</span>}
+        {genres.length === 0 && <span className="text-xs text-muted-foreground">{t('filters.genresLoading')}</span>}
         </div>
       )}
 
-      <div className="flex items-center gap-1.5" role="group" aria-label="Tahun rilis">
+      <div className="flex items-center gap-1.5" role="group" aria-label={t('filters.yearGroup')}>
         <YearInput
           value={filters.from}
           onCommit={(from) => onChange({ filters: { ...filters, from } })}
-          label="Tahun dari"
-          placeholder="Dari"
+          label={t('filters.yearFrom')}
+          placeholder={t('filters.from')}
         />
         <span className="text-xs text-muted-foreground" aria-hidden="true">—</span>
         <YearInput
           value={filters.to}
           onCommit={(to) => onChange({ filters: { ...filters, to } })}
-          label="Tahun sampai"
-          placeholder="Sampai"
+          label={t('filters.yearTo')}
+          placeholder={t('filters.to')}
         />
       </div>
 
-      <div className="flex overflow-hidden rounded-lg border border-border" role="group" aria-label="Tipe konten">
-        {(['movie', 'tv'] as MediaType[]).map((t) => (
+      <div className="flex overflow-hidden rounded-lg border border-border" role="group" aria-label={t('filters.typeGroup')}>
+        {(['movie', 'tv'] as MediaType[]).map((tm) => (
           <button
-            key={t}
+            key={tm}
             type="button"
-            onClick={() => setActive(t)}
-            aria-pressed={type === t}
+            onClick={() => setActive(tm)}
+            aria-pressed={type === tm}
             className={
               'cursor-pointer px-3 py-1 text-xs transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 ' +
-              (type === t ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground')
+              (type === tm ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground')
             }
           >
-            {t === 'movie' ? 'Film' : 'Serial'}
+            {tm === 'movie' ? t('common.movie') : t('common.tv')}
           </button>
         ))}
       </div>
@@ -123,7 +126,7 @@ export function Filters({ type, filters, onChange }: Props) {
           onChange={(e) => onChange({ filters: { ...filters, indonesia: e.target.checked } })}
           className="size-3.5 cursor-pointer accent-[var(--primary)]"
         />
-        Konten Indonesia
+        {t('filters.indonesia')}
       </label>
 
       <label className="flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground">
@@ -133,7 +136,7 @@ export function Filters({ type, filters, onChange }: Props) {
           onChange={(e) => onChange({ filters: { ...filters, adult: e.target.checked } })}
           className="size-3.5 cursor-pointer accent-[var(--primary)]"
         />
-        Konten dewasa (18+)
+        {t('filters.adult')}
       </label>
 
       <ProviderSelect
@@ -148,7 +151,7 @@ export function Filters({ type, filters, onChange }: Props) {
           onClick={() => onChange({ filters: { genres: [], from: null, to: null, adult: false, provider: null, indonesia: false } })}
         >
           <X className="size-3" aria-hidden="true" />
-          Hapus filter
+          {t('filters.clear')}
         </Button>
       )}
     </section>
@@ -162,12 +165,13 @@ function numYear(v: string): number | null {
 }
 
 function ProviderSelect({ value, onChange }: { value: number | null; onChange: (v: number | null) => void }) {
+  const { t, locale } = useLanguage()
   const [providers, setProviders] = useState<Provider[]>([])
 
   useEffect(() => {
     // provider ID konsisten lintas type — fetch movie list cukup, tak perlu per-type
     let active = true
-    providerList('movie')
+    providerList('movie', locale)
       .then((p) => {
         if (active) setProviders(p)
       })
@@ -177,18 +181,18 @@ function ProviderSelect({ value, onChange }: { value: number | null; onChange: (
     return () => {
       active = false
     }
-  }, [])
+  }, [locale])
 
   return (
     <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
-      <span className="sr-only">Provider streaming</span>
+      <span className="sr-only">{t('filters.provider')}</span>
       <select
         value={value ?? ''}
         onChange={(e) => onChange(e.target.value ? Number(e.target.value) : null)}
-        aria-label="Provider streaming"
+        aria-label={t('filters.provider')}
         className="h-7 cursor-pointer rounded-lg border border-border bg-muted px-2 text-xs text-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
       >
-        <option value="">Semua provider</option>
+        <option value="">{t('filters.providerAll')}</option>
         {providers.map((p) => (
           <option key={p.id} value={p.id}>
             {p.name}

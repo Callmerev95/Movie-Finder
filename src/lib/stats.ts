@@ -25,14 +25,13 @@ export interface WatchlistStats {
   topRated: WatchlistEntry[]
 }
 
-const MONTHS_ID = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
-
 function monthKey(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
 }
 
-function monthLabel(d: Date): string {
-  return `${MONTHS_ID[d.getMonth()]} ${String(d.getFullYear()).slice(2)}`
+function monthLabel(d: Date, locale = 'id-ID'): string {
+  const mon = d.toLocaleString(locale, { month: 'short' }).replace(/\./g, '')
+  return `${mon} ${String(d.getFullYear()).slice(2)}`
 }
 
 function mean(ns: (number | null | undefined)[]): number | null {
@@ -42,7 +41,7 @@ function mean(ns: (number | null | undefined)[]): number | null {
 }
 
 // agregasi murni dari entri lokal — nol fetch, hasil untuk StatsPage
-export function watchlistStats(entries: WatchlistEntry[], monthsBack = 6, now = new Date()): WatchlistStats {
+export function watchlistStats(entries: WatchlistEntry[], monthsBack = 6, now = new Date(), locale = 'id-ID'): WatchlistStats {
   const distribution: RatingBucket[] = [1, 2, 3, 4, 5].map((rating) => ({
     rating,
     count: entries.filter((e) => e.rating === rating).length,
@@ -53,7 +52,7 @@ export function watchlistStats(entries: WatchlistEntry[], monthsBack = 6, now = 
   for (let i = monthsBack - 1; i >= 0; i--) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
     const key = monthKey(d)
-    buckets.set(key, { month: key, label: monthLabel(d), count: 0 })
+    buckets.set(key, { month: key, label: monthLabel(d, locale), count: 0 })
   }
   for (const e of entries) {
     const d = new Date(e.addedAt)

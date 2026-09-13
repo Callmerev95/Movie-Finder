@@ -75,7 +75,7 @@ export function mergeImport(current: WatchlistEntry[], incoming: WatchlistEntry[
   return [...current, ...incoming.filter((e) => !current.some((c) => sameItem(c, e)))]
 }
 
-export function sortWatchlist(list: WatchlistEntry[], sort: SortKey): WatchlistEntry[] {
+export function sortWatchlist(list: WatchlistEntry[], sort: SortKey, locale = 'id'): WatchlistEntry[] {
   const copy = [...list]
   switch (sort) {
     case 'added':
@@ -83,7 +83,7 @@ export function sortWatchlist(list: WatchlistEntry[], sort: SortKey): WatchlistE
     case 'rating':
       return copy.sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1) || b.addedAt.localeCompare(a.addedAt))
     case 'title':
-      return copy.sort((a, b) => a.title.localeCompare(b.title, 'id'))
+      return copy.sort((a, b) => a.title.localeCompare(b.title, locale))
   }
 }
 

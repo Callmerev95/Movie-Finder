@@ -5,9 +5,11 @@ import { Button } from '@/components/ui/button'
 import { imageUrl } from '@/lib/tmdb'
 import type { Item } from '@/lib/types'
 import { useWatchlist } from '@/lib/useWatchlist'
+import { useLanguage } from '@/lib/useLanguage'
 import { toastSuccess, toastWithUndo } from '@/lib/toast'
 
 export function ResultCard({ item }: { item: Item }) {
+  const { t } = useLanguage()
   const { has, add, remove, restore, entries } = useWatchlist()
   const saved = has(item)
   const poster = imageUrl(item.posterPath, 'w342')
@@ -16,12 +18,12 @@ export function ResultCard({ item }: { item: Item }) {
     if (saved) {
       const entry = entries.find((e) => e.type === item.type && e.tmdbId === item.tmdbId)
       remove(item)
-      toastWithUndo('Dihapus dari watchlist', item.title, () => {
+      toastWithUndo(t('common.toastRemoved'), item.title, () => {
         if (entry) restore(entry)
       })
     } else {
       add(item)
-      toastSuccess('Ditambahkan ke watchlist', item.title)
+      toastSuccess(t('common.toastAdded'), item.title)
     }
   }
 
@@ -35,14 +37,14 @@ export function ResultCard({ item }: { item: Item }) {
           {poster ? (
             <img
               src={poster}
-              alt={`Poster ${item.title}${item.year ? ` (${item.year})` : ''}`}
+              alt={t('common.poster', { title: item.title }) + (item.year ? ` (${item.year})` : '')}
               loading="lazy"
               decoding="async"
               className="size-full object-cover transition-transform duration-200 ease-out group-hover/card:scale-102 group-hover/card:brightness-110 motion-reduce:transition-none motion-reduce:group-hover/card:scale-100 motion-reduce:group-hover/card:brightness-100"
             />
           ) : (
             <div className="flex size-full items-center justify-center text-xs text-muted-foreground">
-              Tanpa poster
+              {t('common.noPoster')}
             </div>
           )}
         </div>
@@ -63,14 +65,14 @@ export function ResultCard({ item }: { item: Item }) {
         <Button
           size="icon-xs"
           variant={saved ? 'secondary' : 'default'}
-          aria-label={saved ? `Hapus ${item.title} dari watchlist` : `Simpan ${item.title} ke watchlist`}
+          aria-label={saved ? t('common.removeItem', { title: item.title }) : t('common.saveItem', { title: item.title })}
           onClick={toggle}
         >
           {saved ? <Check className="size-3" aria-hidden="true" /> : <Plus className="size-3" aria-hidden="true" />}
         </Button>
       </div>
       <Badge variant="outline" className="absolute top-2 start-2 border-border/60 bg-background/80 text-muted-foreground backdrop-blur">
-        {item.type === 'movie' ? 'Film' : 'Serial'}
+        {item.type === 'movie' ? t('common.movie') : t('common.tv')}
       </Badge>
     </article>
   )

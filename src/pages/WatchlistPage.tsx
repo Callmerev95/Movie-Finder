@@ -6,20 +6,23 @@ import { Button } from '@/components/ui/button'
 import { imageUrl } from '@/lib/tmdb'
 import { sortWatchlist, mergeImport, parseWatchlist, type SortKey } from '@/lib/watchlist'
 import { useWatchlist } from '@/lib/useWatchlist'
+import { useLanguage } from '@/lib/useLanguage'
 import { Stars } from '@/components/Stars'
 import { toastSuccess, toastWithUndo } from '@/lib/toast'
 
-const SORTS: { key: SortKey; label: string }[] = [
-  { key: 'added', label: 'Terbaru ditambah' },
-  { key: 'rating', label: 'Rating tertinggi' },
-  { key: 'title', label: 'Judul A-Z' },
+const SORTS = (t: (k: 'watchlist.sortAdded' | 'watchlist.sortRating' | 'watchlist.sortTitle') => string): { key: SortKey; label: string }[] => [
+  { key: 'added', label: t('watchlist.sortAdded') },
+  { key: 'rating', label: t('watchlist.sortRating') },
+  { key: 'title', label: t('watchlist.sortTitle') },
 ]
 
 export default function WatchlistPage() {
+  const { t, locale, lang } = useLanguage()
   const { entries, rate, remove, restore, setWatched, setAll } = useWatchlist()
   const [sort, setSort] = useState<SortKey>('added')
   const fileRef = useRef<HTMLInputElement>(null)
-  const sorted = useMemo(() => sortWatchlist(entries, sort), [entries, sort])
+  const sorted = useMemo(() => sortWatchlist(entries, sort, lang), [entries, sort, lang])
+  const sorts = useMemo(() => SORTS(t), [t])
 
   const handleExport = () => {
     const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' })
@@ -37,10 +40,13 @@ export default function WatchlistPage() {
     const before = entries.length
     const merged = mergeImport(entries, imported)
     setAll(merged)
+    const added = merged.length - before
     toastSuccess(
       imported.length === 0
-        ? 'File tidak berisi item yang valid'
-        : `Import ${merged.length - before} item baru (duplikat dilewati)`,
+        ? t('watchlist.importEmpty')
+        : added === 1
+          ? t('watchlist.importOne')
+          : t('watchlist.importMany', { n: added }),
     )
   }
 
@@ -48,14 +54,14 @@ export default function WatchlistPage() {
     return (
       <div className="mt-16 flex flex-col items-center gap-3 text-center">
         <Bookmark className="size-10 text-muted-foreground/50" aria-hidden="true" />
-        <p className="text-sm text-muted-foreground">Belum ada film disimpan. Cari judul untuk mulai.</p>
+        <p className="text-sm text-muted-foreground">{t('watchlist.empty')}</p>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
             <Upload className="size-4" aria-hidden="true" />
-            Impor dari file
+            {t('watchlist.importFile')}
           </Button>
           <Button variant="outline" size="sm" render={<Link to="/" />}>
-            Cari film
+            {t('watchlist.searchCta')}
           </Button>
           <input
             ref={fileRef}
@@ -75,13 +81,13 @@ export default function WatchlistPage() {
 
   return (
     <div className="pt-6">
-      <h1 className="text-2xl font-medium tracking-tight">Watchlist</h1>
+      <h1 className="text-2xl font-medium tracking-tight">{t('watchlist.title')}</h1>
       <p className="mt-1 text-xs text-muted-foreground">
-        Daftar tontonan pribadi — tersimpan di browser ini.
+        {t('watchlist.desc')}
       </p>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Urutkan watchlist">
-          {SORTS.map((s) => (
+        <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t('watchlist.sortLabel')}>
+          {sorts.map((s) => (
             <button
               key={s.key}
               type="button"
@@ -101,15 +107,15 @@ export default function WatchlistPage() {
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" render={<Link to="/stats" />}>
             <BarChart3 className="size-4" aria-hidden="true" />
-            Statistik
+            {t('watchlist.stats')}
           </Button>
           <Button variant="outline" size="sm" onClick={handleExport}>
             <Download className="size-4" aria-hidden="true" />
-            Ekspor
+            {t('watchlist.export')}
           </Button>
           <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
             <Upload className="size-4" aria-hidden="true" />
-            Impor
+            {t('watchlist.import')}
           </Button>
           <input
             ref={fileRef}
@@ -152,17 +158,17 @@ export default function WatchlistPage() {
                 {e.title}
               </Link>
               <p className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                <Badge variant="outline">{e.type === 'movie' ? 'Film' : 'Serial'}</Badge>
+                <Badge variant="outline">{e.type === 'movie' ? t('common.movie') : t('common.tv')}</Badge>
                 {e.year && <span className="tabular-nums">{e.year}</span>}
                 <span className="hidden sm:inline tabular-nums">
-                  Ditambah {new Date(e.addedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  {t('watchlist.addedOn', { date: new Date(e.addedAt).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' }) })}
                 </span>
               </p>
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <Stars
                   value={e.rating}
                   onChange={(v: number | null) => rate({ type: e.type, tmdbId: e.tmdbId }, v)}
-                  label={`Rating ${e.title}`}
+                  label={t('common.ratingOf', { title: e.title })}
                 />
                 <button
                   type="button"
@@ -176,18 +182,18 @@ export default function WatchlistPage() {
                   }
                 >
                   <Check className="size-3" aria-hidden="true" />
-                  {e.watched ? 'Sudah ditonton' : 'Tandai ditonton'}
+                  {e.watched ? t('common.watched') : t('common.markWatched')}
                 </button>
               </div>
             </div>
             <Button
               variant="ghost"
               size="icon-sm"
-              aria-label={`Hapus ${e.title} dari watchlist`}
+              aria-label={t('common.removeItem', { title: e.title })}
               className="self-start text-destructive hover:bg-destructive/10"
               onClick={() => {
                 remove({ type: e.type, tmdbId: e.tmdbId })
-                toastWithUndo('Dihapus dari watchlist', e.title, () => {
+                toastWithUndo(t('common.toastRemoved'), e.title, () => {
                   restore(e)
                 })
               }}

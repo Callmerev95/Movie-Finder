@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Section } from '@/components/Section'
 import { imageUrl } from '@/lib/tmdb'
 import { useWatchlist } from '@/lib/useWatchlist'
+import { useLanguage } from '@/lib/useLanguage'
 import { watchlistStats } from '@/lib/stats'
 
 // donut SVG murni: dua segmen via stroke-dasharray, tanpa library chart
@@ -78,16 +79,17 @@ function StatCard({ label, value }: { label: string; value: string }) {
 }
 
 export default function StatsPage() {
+  const { t, locale } = useLanguage()
   const { entries } = useWatchlist()
-  const s = useMemo(() => watchlistStats(entries), [entries])
+  const s = useMemo(() => watchlistStats(entries, 6, new Date(), locale), [entries, locale])
 
   if (entries.length === 0) {
     return (
       <div className="mt-16 flex flex-col items-center gap-3 text-center">
         <BarChart3 className="size-10 text-muted-foreground/50" aria-hidden="true" />
-        <p className="text-sm text-muted-foreground">Belum ada data — simpan film untuk melihat statistik.</p>
+        <p className="text-sm text-muted-foreground">{t('stats.empty')}</p>
         <Button variant="outline" size="sm" render={<Link to="/" />}>
-          Cari film
+          {t('stats.searchCta')}
         </Button>
       </div>
     )
@@ -98,52 +100,52 @@ export default function StatsPage() {
 
   return (
     <div className="pt-6">
-      <h1 className="text-2xl font-medium tracking-tight">Statistik</h1>
-      <p className="mt-1 text-xs text-muted-foreground">Ringkasan watchlist — dihitung lokal dari data tersimpan.</p>
+      <h1 className="text-2xl font-medium tracking-tight">{t('stats.title')}</h1>
+      <p className="mt-1 text-xs text-muted-foreground">{t('stats.desc')}</p>
 
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Total item" value={String(s.total)} />
-        <StatCard label="Sudah ditonton" value={String(s.watched)} />
-        <StatCard label="Belum ditonton" value={String(s.unwatched)} />
-        <StatCard label="Rata-rata rating" value={s.avgRating !== null ? s.avgRating.toFixed(1) : '—'} />
+        <StatCard label={t('stats.total')} value={String(s.total)} />
+        <StatCard label={t('stats.watched')} value={String(s.watched)} />
+        <StatCard label={t('stats.unwatched')} value={String(s.unwatched)} />
+        <StatCard label={t('stats.avgRating')} value={s.avgRating !== null ? s.avgRating.toFixed(1) : '—'} />
       </div>
 
       <div className="mt-2 grid gap-x-8 sm:grid-cols-2">
-        <Section title="Film vs Serial" divider className="mt-10">
+        <Section title={t('stats.typeTitle')} divider className="mt-10">
           <Donut
-            label={`${s.movies} film, ${s.series} serial`}
+            label={`${s.movies} ${t('common.movie')}, ${s.series} ${t('common.tv')}`}
             parts={[
-              { value: s.movies, color: 'var(--primary)', name: 'Film' },
-              { value: s.series, color: 'var(--muted-foreground)', name: 'Serial' },
+              { value: s.movies, color: 'var(--primary)', name: t('common.movie') },
+              { value: s.series, color: 'var(--muted-foreground)', name: t('common.tv') },
             ]}
           />
         </Section>
-        <Section title="Status tontonan" divider className="mt-10">
+        <Section title={t('stats.statusTitle')} divider className="mt-10">
           <Donut
-            label={`${s.watched} ditonton, ${s.unwatched} belum`}
+            label={`${s.watched} ${t('common.watched')}, ${s.unwatched} ${t('stats.notYet')}`}
             parts={[
-              { value: s.watched, color: 'var(--primary)', name: 'Ditonton' },
-              { value: s.unwatched, color: 'var(--muted-foreground)', name: 'Belum' },
+              { value: s.watched, color: 'var(--primary)', name: t('common.watched') },
+              { value: s.unwatched, color: 'var(--muted-foreground)', name: t('stats.notYet') },
             ]}
           />
         </Section>
       </div>
 
       <Section
-        title="Distribusi rating"
-        description={s.unrated > 0 ? `${s.unrated} item belum dirating.` : 'Semua item sudah dirating.'}
+        title={t('stats.distTitle')}
+        description={s.unrated > 0 ? t('stats.distSomeUnrated', { n: s.unrated }) : t('stats.distAllRated')}
         divider
         className="mt-10"
       >
-        <div className="flex max-w-md flex-col gap-2" role="img" aria-label={`Distribusi rating: ${s.distribution.map((d) => `${d.rating} bintang ${d.count}`).join(', ')}`}>
+        <div className="flex max-w-md flex-col gap-2" role="img" aria-label={`${t('stats.distTitle')}: ${s.distribution.map((d) => `${d.rating}: ${d.count}`).join(', ')}`}>
           {[...s.distribution].reverse().map((d) => (
             <Bar key={d.rating} label={`${d.rating}★`} count={d.count} max={distMax} />
           ))}
         </div>
       </Section>
 
-      <Section title="Ditambah per bulan" description="6 bulan terakhir." divider className="mt-10">
-        <div className="flex max-w-md flex-col gap-2" role="img" aria-label={`Ditambah per bulan: ${s.byMonth.map((b) => `${b.label} ${b.count}`).join(', ')}`}>
+      <Section title={t('stats.monthTitle')} description={t('stats.monthDesc')} divider className="mt-10">
+        <div className="flex max-w-md flex-col gap-2" role="img" aria-label={`${t('stats.monthTitle')}: ${s.byMonth.map((b) => `${b.label} ${b.count}`).join(', ')}`}>
           {s.byMonth.map((b) => (
             <Bar key={b.month} label={b.label} count={b.count} max={monthMax} />
           ))}
@@ -151,8 +153,8 @@ export default function StatsPage() {
       </Section>
 
       <Section
-        title="Rating tertinggi"
-        description={s.avgScore !== null ? `Skor TMDb rata-rata koleksi: ${s.avgScore.toFixed(1)}.` : undefined}
+        title={t('stats.topTitle')}
+        description={s.avgScore !== null ? t('stats.topAvg', { v: s.avgScore.toFixed(1) }) : undefined}
         divider
         className="mt-10"
       >
@@ -168,7 +170,7 @@ export default function StatsPage() {
                   {e.posterPath ? (
                     <img
                       src={imageUrl(e.posterPath, 'w92') ?? ''}
-                      alt={`Poster ${e.title}`}
+                      alt={t('common.poster', { title: e.title })}
                       loading="lazy"
                       decoding="async"
                       className="aspect-2/3 w-full object-cover"
@@ -188,15 +190,15 @@ export default function StatsPage() {
                   </Link>
                   <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground tabular-nums">
                     <Star className="size-3 fill-primary text-primary" aria-hidden="true" />
-                    {e.rating} pribadi
-                    {e.score !== null ? ` · Skor TMDb ${e.score.toFixed(1)}` : ''}
+                    {t('stats.personal', { r: e.rating ?? 0 })}
+                    {e.score !== null ? ` · ${t('stats.tmdbScore', { v: e.score.toFixed(1) })}` : ''}
                   </p>
                 </div>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-muted-foreground">Belum ada item yang dirating.</p>
+          <p className="text-sm text-muted-foreground">{t('stats.topEmpty')}</p>
         )}
       </Section>
     </div>
