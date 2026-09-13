@@ -3,6 +3,7 @@ import type { Item } from './types'
 export interface WatchlistEntry extends Item {
   addedAt: string
   rating: number | null
+  watched: boolean
 }
 
 export type SortKey = 'added' | 'rating' | 'title'
@@ -21,7 +22,7 @@ export function parseWatchlist(json: string | null): WatchlistEntry[] {
     return raw.filter(
       (e) =>
         e && typeof e === 'object' && (e.type === 'movie' || e.type === 'tv') && typeof e.tmdbId === 'number',
-    )
+    ).map((e) => ({ ...e, watched: e.watched === true }))
   } catch {
     return []
   }
@@ -33,7 +34,7 @@ export function serializeWatchlist(list: WatchlistEntry[]): string {
 
 export function addEntry(list: WatchlistEntry[], item: Item): WatchlistEntry[] {
   if (list.some((e) => sameItem(e, item))) return list
-  return [{ ...item, rating: null, addedAt: new Date().toISOString() }, ...list]
+  return [{ ...item, rating: null, watched: false, addedAt: new Date().toISOString() }, ...list]
 }
 
 // undo remove: kembalikan snapshot persis (rating + addedAt asli), bukan add() baru
@@ -59,6 +60,14 @@ export function setRating(
 // auto-add (Q4b): add + rate dalam satu operasi, data item penuh
 export function addWithRating(list: WatchlistEntry[], item: Item, rating: number | null): WatchlistEntry[] {
   return setRating(addEntry(list, item), item, rating)
+}
+
+export function setWatched(
+  list: WatchlistEntry[],
+  key: Pick<Item, 'type' | 'tmdbId'>,
+  watched: boolean,
+): WatchlistEntry[] {
+  return list.map((e) => (sameItem(e, key) ? { ...e, watched } : e))
 }
 
 // import: gabung, item existing menang persis (rating + addedAt tak ditimpa)

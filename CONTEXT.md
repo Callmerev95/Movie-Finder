@@ -14,6 +14,11 @@ _Avoid_: Bookmark, favorit, daftar simpanan
 Nilai 1-5 bintang yang diberikan pengguna pada item di watchlist-nya.
 _Avoid_: Skor, ulasan, review
 
+**Ditonton**:
+Penanda opsional pada entri Watchlist bahwa pengguna sudah menonton Item.
+Bukan status TMDb — murni catatan pribadi, default belum ditonton.
+_Avoid_: Selesai, watched, status tayang
+
 **Skor TMDb**:
 Nilai rata-rata publik 0-10 dari TMDb (vote_average), ditampilkan apa adanya;
 bukan Rating pengguna.

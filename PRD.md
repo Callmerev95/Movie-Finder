@@ -24,6 +24,7 @@
 | US-4 | Sebagai pengguna, saya ingin menyimpan item ke watchlist agar tidak lupa. | Tombol add/remove dari hasil & detail; watchlist bertahan setelah refresh; badge jumlah item di navigasi. |
 | US-5 | Sebagai pengguna, saya ingin memberi rating 1–5 agar mencatat opini pribadi. | Rating di halaman detail otomatis add item ke watchlist + set rating (satu langkah); di watchlist bisa edit/clear rating; tersimpan persisten. |
 | US-6 | Sebagai pengguna, saya ingin mengelola watchlist agar rapi. | Hapus item; sort by tanggal ditambah (default) / rating / judul; empty state jelas saat list kosong. |
+| US-7 | Sebagai pengguna, saya ingin menandai item di watchlist yang sudah saya tonton agar tidak lupa. | Chip "Tandai ditonton" per item di WatchlistPage + saat item sudah tersimpan di DetailPage; default belum ditonton, persist di localStorage bersama metadata watchlist. |
 
 ### Model item watchlist
 

@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bookmark, Download, Trash2, Upload } from 'lucide-react'
+import { Bookmark, Check, Download, Trash2, Upload } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { imageUrl } from '@/lib/tmdb'
@@ -16,7 +16,7 @@ const SORTS: { key: SortKey; label: string }[] = [
 ]
 
 export default function WatchlistPage() {
-  const { entries, rate, remove, restore, setAll } = useWatchlist()
+  const { entries, rate, remove, restore, setWatched, setAll } = useWatchlist()
   const [sort, setSort] = useState<SortKey>('added')
   const fileRef = useRef<HTMLInputElement>(null)
   const sorted = useMemo(() => sortWatchlist(entries, sort), [entries, sort])
@@ -151,12 +151,26 @@ export default function WatchlistPage() {
                   Ditambah {new Date(e.addedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </span>
               </p>
-              <div className="mt-2">
+              <div className="mt-2 flex flex-wrap items-center gap-2">
                 <Stars
                   value={e.rating}
                   onChange={(v: number | null) => rate({ type: e.type, tmdbId: e.tmdbId }, v)}
                   label={`Rating ${e.title}`}
                 />
+                <button
+                  type="button"
+                  aria-pressed={e.watched}
+                  onClick={() => setWatched({ type: e.type, tmdbId: e.tmdbId }, !e.watched)}
+                  className={
+                    'inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 ' +
+                    (e.watched
+                      ? 'border-transparent bg-primary/15 text-primary'
+                      : 'border-border bg-muted text-muted-foreground hover:text-foreground')
+                  }
+                >
+                  <Check className="size-3" aria-hidden="true" />
+                  {e.watched ? 'Sudah ditonton' : 'Tandai ditonton'}
+                </button>
               </div>
             </div>
             <Button

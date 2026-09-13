@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, Calendar, Clock, ExternalLink, Star } from 'lucide-react'
+import { ArrowLeft, Calendar, Check, Clock, ExternalLink, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Stars } from '@/components/Stars'
@@ -157,6 +157,24 @@ export default function DetailPage() {
             <Button variant={saved ? 'secondary' : 'default'} onClick={toggleSave}>
               {saved ? 'Hapus dari watchlist' : 'Simpan ke watchlist'}
             </Button>
+            {saved && (
+              <button
+                type="button"
+                aria-pressed={entry?.watched ?? false}
+                onClick={() => {
+                  if (entry) wl.setWatched(key, !entry.watched)
+                }}
+                className={
+                  'inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 ' +
+                  (entry?.watched
+                    ? 'border-transparent bg-primary/15 text-primary'
+                    : 'border-border bg-muted text-muted-foreground hover:text-foreground')
+                }
+              >
+                <Check className="size-3" aria-hidden="true" />
+                {entry?.watched ? 'Sudah ditonton' : 'Tandai ditonton'}
+              </button>
+            )}
             <Stars value={entry?.rating ?? null} onChange={rate} label={`Rating ${data.title}`} />
           </div>
 
