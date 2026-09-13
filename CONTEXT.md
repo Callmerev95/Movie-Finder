@@ -68,6 +68,8 @@ _Avoid_: Platform, where-to-watch
 
 **Konten Indonesia**:
 Filter Discover untuk item produksi Indonesia — Film berbahasa asli
-Indonesia atau Serial berproduksi Indonesia. Satu toggle, kriteria
+Indonesia atau Serial berproduksi Indonesia. Saat aktif, hasil diurutkan
+terbaru dulu dan dibatasi sampai tanggal hari ini (belum tayang tidak
+tampil; batas Tahun eksplisit tetap menang). Satu toggle, kriteria
 berbeda per Type.
 _Avoid_: Film lokal (untuk filter)

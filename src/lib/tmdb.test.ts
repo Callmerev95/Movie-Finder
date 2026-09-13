@@ -99,27 +99,43 @@ describe('buildDiscoverParams', () => {
     })
   })
 
-  it('indonesia: movie pakai with_original_language, tv pakai with_origin_country', () => {
-    expect(buildDiscoverParams({ ...base, genres: [], indonesia: true }, 'movie', 1)).toEqual({
+  it('indonesia: movie pakai with_original_language + sort terbaru + cap hari ini, tv pakai with_origin_country', () => {
+    expect(buildDiscoverParams({ ...base, genres: [], indonesia: true }, 'movie', 1, '2026-09-13')).toEqual({
       page: 1,
       include_adult: false,
       with_original_language: 'id',
+      sort_by: 'primary_release_date.desc',
+      'primary_release_date.lte': '2026-09-13',
     })
-    expect(buildDiscoverParams({ ...base, genres: [], indonesia: true }, 'tv', 1)).toEqual({
+    expect(buildDiscoverParams({ ...base, genres: [], indonesia: true }, 'tv', 1, '2026-09-13')).toEqual({
       page: 1,
       include_adult: false,
       with_origin_country: 'ID',
+      sort_by: 'first_air_date.desc',
+      'first_air_date.lte': '2026-09-13',
+    })
+  })
+
+  it('indonesia + tahun `to` eksplisit: cap tahun user menang, sort tetap terbaru', () => {
+    expect(buildDiscoverParams({ ...base, genres: [], indonesia: true, to: 2020 }, 'movie', 1, '2026-09-13')).toEqual({
+      page: 1,
+      include_adult: false,
+      with_original_language: 'id',
+      sort_by: 'primary_release_date.desc',
+      'primary_release_date.lte': '2020-12-31',
     })
   })
 
   it('kombinasi: genre + tahun + provider + indonesia + tv', () => {
     expect(
-      buildDiscoverParams({ ...base, genres: [18], from: 2000, provider: 119, indonesia: true }, 'tv', 2),
+      buildDiscoverParams({ ...base, genres: [18], from: 2000, provider: 119, indonesia: true }, 'tv', 2, '2026-09-13'),
     ).toEqual({
       page: 2,
       include_adult: false,
       with_genres: '18',
       'first_air_date.gte': '2000-01-01',
+      'first_air_date.lte': '2026-09-13',
+      sort_by: 'first_air_date.desc',
       watch_region: 'ID',
       with_watch_providers: 119,
       with_origin_country: 'ID',

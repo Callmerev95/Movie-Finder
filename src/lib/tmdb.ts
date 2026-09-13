@@ -119,7 +119,12 @@ export function buildSearchParams(query: string, page: number): Record<string, s
   return { query, page, include_adult: false }
 }
 
-export function buildDiscoverParams(filters: Filters, type: MediaType, page: number): Record<string, string | number | boolean> {
+export function buildDiscoverParams(
+  filters: Filters,
+  type: MediaType,
+  page: number,
+  today = new Date().toISOString().slice(0, 10),
+): Record<string, string | number | boolean> {
   const params: Record<string, string | number | boolean> = { page, include_adult: filters.adult }
   if (filters.genres.length > 0) params.with_genres = filters.genres.join(',')
   if (filters.from !== null) params['primary_release_date.gte'] = `${filters.from}-01-01`
@@ -132,6 +137,10 @@ export function buildDiscoverParams(filters: Filters, type: MediaType, page: num
     // movie: bahasa asli id; tv: negara produksi ID (param bahasa tak ada di tv)
     if (type === 'movie') params.with_original_language = 'id'
     else params.with_origin_country = 'ID'
+    // konten Indonesia = terbaru dulu; cap hari ini cegah film belum tayang
+    // (cap tahun user `to` menang bila eksplisit)
+    params.sort_by = type === 'movie' ? 'primary_release_date.desc' : 'first_air_date.desc'
+    if (filters.to === null) params['primary_release_date.lte'] = today
   }
   if (type === 'tv') {
     // primary_release_date = first_air_date di discover tv
