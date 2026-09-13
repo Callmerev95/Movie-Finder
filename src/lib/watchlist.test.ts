@@ -5,6 +5,7 @@ import {
   parseWatchlist,
   removeEntry,
   restoreEntry,
+  mergeImport,
   sameItem,
   serializeWatchlist,
   setRating,
@@ -78,5 +79,17 @@ describe('watchlist ops', () => {
   it('serialize → parse roundtrip', () => {
     const l = addWithRating(addEntry([], movie), tv, 5)
     expect(parseWatchlist(serializeWatchlist(l))).toEqual(l)
+  })
+
+  it('mergeImport: duplikat dilewati, existing menang, entri baru di belakang', () => {
+    const existing = [{ ...movie, addedAt: '2026-01-01', rating: 4 }]
+    const incoming = [
+      { ...movie, addedAt: '2020-05-05', rating: null }, // duplikat — existing menang
+      { ...tv, addedAt: '2020-06-06', rating: 2 },
+    ]
+    const merged = mergeImport(existing, incoming)
+    expect(merged).toHaveLength(2)
+    expect(merged[0]).toEqual(existing[0])
+    expect(merged[1].addedAt).toBe('2020-06-06')
   })
 })

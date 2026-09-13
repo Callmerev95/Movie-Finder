@@ -1,13 +1,13 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bookmark, Trash2 } from 'lucide-react'
+import { Bookmark, Download, Trash2, Upload } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { imageUrl } from '@/lib/tmdb'
-import { sortWatchlist, type SortKey } from '@/lib/watchlist'
+import { sortWatchlist, mergeImport, parseWatchlist, type SortKey } from '@/lib/watchlist'
 import { useWatchlist } from '@/lib/useWatchlist'
 import { Stars } from '@/components/Stars'
-import { toastWithUndo } from '@/lib/toast'
+import { toastSuccess, toastWithUndo } from '@/lib/toast'
 
 const SORTS: { key: SortKey; label: string }[] = [
   { key: 'added', label: 'Terbaru ditambah' },
@@ -16,18 +16,59 @@ const SORTS: { key: SortKey; label: string }[] = [
 ]
 
 export default function WatchlistPage() {
-  const { entries, rate, remove, restore } = useWatchlist()
+  const { entries, rate, remove, restore, setAll } = useWatchlist()
   const [sort, setSort] = useState<SortKey>('added')
+  const fileRef = useRef<HTMLInputElement>(null)
   const sorted = useMemo(() => sortWatchlist(entries, sort), [entries, sort])
+
+  const handleExport = () => {
+    const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `movie-finder-watchlist-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleImport = async (file: File) => {
+    const text = await file.text()
+    const imported = parseWatchlist(text)
+    const before = entries.length
+    const merged = mergeImport(entries, imported)
+    setAll(merged)
+    toastSuccess(
+      imported.length === 0
+        ? 'File tidak berisi item yang valid'
+        : `Import ${merged.length - before} item baru (duplikat dilewati)`,
+    )
+  }
 
   if (entries.length === 0) {
     return (
       <div className="mt-16 flex flex-col items-center gap-3 text-center">
         <Bookmark className="size-10 text-muted-foreground/50" aria-hidden="true" />
         <p className="text-sm text-muted-foreground">Belum ada film disimpan. Cari judul untuk mulai.</p>
-        <Button variant="outline" size="sm" render={<Link to="/" />}>
-          Cari film
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
+            <Upload className="size-4" aria-hidden="true" />
+            Impor dari file
+          </Button>
+          <Button variant="outline" size="sm" render={<Link to="/" />}>
+            Cari film
+          </Button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="application/json,.json"
+            className="sr-only"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file) handleImport(file)
+              e.target.value = ''
+            }}
+          />
+        </div>
       </div>
     )
   }
@@ -35,23 +76,46 @@ export default function WatchlistPage() {
   return (
     <div className="pt-6">
       <h1 className="text-2xl font-medium tracking-tight">Watchlist</h1>
-      <div className="mt-4 flex flex-wrap items-center gap-2" role="group" aria-label="Urutkan watchlist">
-        {SORTS.map((s) => (
-          <button
-            key={s.key}
-            type="button"
-            onClick={() => setSort(s.key)}
-            aria-pressed={sort === s.key}
-            className={
-              'cursor-pointer rounded-full border px-3 py-1 text-xs transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 ' +
-              (sort === s.key
-                ? 'border-transparent bg-primary text-primary-foreground'
-                : 'border-border bg-muted text-muted-foreground hover:text-foreground')
-            }
-          >
-            {s.label}
-          </button>
-        ))}
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Urutkan watchlist">
+          {SORTS.map((s) => (
+            <button
+              key={s.key}
+              type="button"
+              onClick={() => setSort(s.key)}
+              aria-pressed={sort === s.key}
+              className={
+                'cursor-pointer rounded-full border px-3 py-1 text-xs transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 ' +
+                (sort === s.key
+                  ? 'border-transparent bg-primary text-primary-foreground'
+                  : 'border-border bg-muted text-muted-foreground hover:text-foreground')
+              }
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleExport}>
+            <Download className="size-4" aria-hidden="true" />
+            Ekspor
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
+            <Upload className="size-4" aria-hidden="true" />
+            Impor
+          </Button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="application/json,.json"
+            className="sr-only"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file) handleImport(file)
+              e.target.value = ''
+            }}
+          />
+        </div>
       </div>
 
       <ul className="mt-6 flex flex-col gap-3">

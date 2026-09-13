@@ -89,7 +89,7 @@ SPA (Browser)
 ### Phased Rollout
 
 - **MVP**: US-1 s/d US-6 + trending landing (`/trending/all/week`) — search film+serial, filter genre/tahun, detail+trailer+tempat menonton, watchlist, rating, sort.
-- **v1.1**: Export/import watchlist JSON (backup anti-hilang); dark mode.
+- **v1.1**: Export/import watchlist JSON (backup anti-hilang); dark mode. — **SELESAI (export/import)**: tombol Ekspor/Impor di WatchlistPage; merge anti-duplikat, item existing menang; validasi pakai `parseWatchlist`; dark mode sudah default (dark-only).
 - **v2.0**: Migrasi ke Supabase Auth + Postgres untuk persist lintas device — skema `watchlist(user_id, type, tmdb_id, rating, added_at)` + RLS.
 
 ### Technical Risks

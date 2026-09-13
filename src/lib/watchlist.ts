@@ -61,6 +61,11 @@ export function addWithRating(list: WatchlistEntry[], item: Item, rating: number
   return setRating(addEntry(list, item), item, rating)
 }
 
+// import: gabung, item existing menang persis (rating + addedAt tak ditimpa)
+export function mergeImport(current: WatchlistEntry[], incoming: WatchlistEntry[]): WatchlistEntry[] {
+  return [...current, ...incoming.filter((e) => !current.some((c) => sameItem(c, e)))]
+}
+
 export function sortWatchlist(list: WatchlistEntry[], sort: SortKey): WatchlistEntry[] {
   const copy = [...list]
   switch (sort) {
