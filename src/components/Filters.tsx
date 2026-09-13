@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Filter, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -82,28 +82,18 @@ export function Filters({ type, filters, onChange }: Props) {
       </div>
 
       <div className="flex items-center gap-1.5" role="group" aria-label="Tahun rilis">
-        <Input
-          type="number"
-          inputMode="numeric"
-          min={1900}
-          max={2100}
+        <YearInput
+          value={filters.from}
+          onCommit={(from) => onChange({ filters: { ...filters, from } })}
+          label="Tahun dari"
           placeholder="Dari"
-          aria-label="Tahun dari"
-          className="h-7 w-20 text-xs tabular-nums"
-          value={filters.from ?? ''}
-          onChange={(e) => onChange({ filters: { ...filters, from: numYear(e.target.value) } })}
         />
         <span className="text-xs text-muted-foreground" aria-hidden="true">—</span>
-        <Input
-          type="number"
-          inputMode="numeric"
-          min={1900}
-          max={2100}
+        <YearInput
+          value={filters.to}
+          onCommit={(to) => onChange({ filters: { ...filters, to } })}
+          label="Tahun sampai"
           placeholder="Sampai"
-          aria-label="Tahun sampai"
-          className="h-7 w-20 text-xs tabular-nums"
-          value={filters.to ?? ''}
-          onChange={(e) => onChange({ filters: { ...filters, to: numYear(e.target.value) } })}
         />
       </div>
 
@@ -152,4 +142,48 @@ function numYear(v: string): number | null {
   if (!v) return null
   const n = Number(v)
   return Number.isInteger(n) && n >= 1900 && n <= 2100 ? n : null
+}
+
+// Teks lokal bebas diketik ("19", "199") — commit angka valid-or-null ke filter.
+// Tanpa ini controlled input value={filters.from} menelan tiap ketikan parsial
+// karena numYear() selalu null untuk digit tak lengkap.
+function YearInput({
+  value,
+  onCommit,
+  label,
+  placeholder,
+}: {
+  value: number | null
+  onCommit: (v: number | null) => void
+  label: string
+  placeholder: string
+}) {
+  const [text, setText] = useState(value?.toString() ?? '')
+  const prevValue = useRef(value)
+
+  useEffect(() => {
+    if (prevValue.current === value) return
+    prevValue.current = value
+    // sync dari luar (Hapus filter, URL, ganti type) HANYA bila teks lokal tak
+    // konsisten dengan nilai baru — hapus digit "1990"→"199" commit null tapi
+    // teks "199" sudah konsisten dengan null, jangan timpa jadi ""
+    if (numYear(text) !== value) setText(value?.toString() ?? '')
+  }, [value, text])
+
+  return (
+    <Input
+      type="number"
+      inputMode="numeric"
+      min={1900}
+      max={2100}
+      placeholder={placeholder}
+      aria-label={label}
+      className="h-7 w-20 text-xs tabular-nums"
+      value={text}
+      onChange={(e) => {
+        setText(e.target.value)
+        onCommit(numYear(e.target.value))
+      }}
+    />
+  )
 }
