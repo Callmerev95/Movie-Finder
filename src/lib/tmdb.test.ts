@@ -68,9 +68,11 @@ describe('buildSearchParams', () => {
 })
 
 describe('buildDiscoverParams', () => {
+  const base = { from: null, to: null, adult: false, provider: null, indonesia: false }
+
   it('movie: primary_release_date + genres + adult', () => {
     expect(
-      buildDiscoverParams({ genres: [28, 35], from: 1990, to: 2000, adult: false }, 'movie', 1),
+      buildDiscoverParams({ ...base, genres: [28, 35], from: 1990, to: 2000 }, 'movie', 1),
     ).toEqual({
       page: 1,
       include_adult: false,
@@ -81,15 +83,51 @@ describe('buildDiscoverParams', () => {
   })
 
   it('tv: pakai first_air_date', () => {
-    expect(buildDiscoverParams({ genres: [], from: 2020, to: null, adult: true }, 'tv', 3)).toEqual({
+    expect(buildDiscoverParams({ ...base, genres: [], from: 2020, to: null, adult: true }, 'tv', 3)).toEqual({
       page: 3,
       include_adult: true,
       'first_air_date.gte': '2020-01-01',
     })
   })
 
+  it('provider → watch_region ID + with_watch_providers', () => {
+    expect(buildDiscoverParams({ ...base, genres: [], provider: 8 }, 'tv', 1)).toEqual({
+      page: 1,
+      include_adult: false,
+      watch_region: 'ID',
+      with_watch_providers: 8,
+    })
+  })
+
+  it('indonesia: movie pakai with_original_language, tv pakai with_origin_country', () => {
+    expect(buildDiscoverParams({ ...base, genres: [], indonesia: true }, 'movie', 1)).toEqual({
+      page: 1,
+      include_adult: false,
+      with_original_language: 'id',
+    })
+    expect(buildDiscoverParams({ ...base, genres: [], indonesia: true }, 'tv', 1)).toEqual({
+      page: 1,
+      include_adult: false,
+      with_origin_country: 'ID',
+    })
+  })
+
+  it('kombinasi: genre + tahun + provider + indonesia + tv', () => {
+    expect(
+      buildDiscoverParams({ ...base, genres: [18], from: 2000, provider: 119, indonesia: true }, 'tv', 2),
+    ).toEqual({
+      page: 2,
+      include_adult: false,
+      with_genres: '18',
+      'first_air_date.gte': '2000-01-01',
+      watch_region: 'ID',
+      with_watch_providers: 119,
+      with_origin_country: 'ID',
+    })
+  })
+
   it('tanpa filter = hanya page + adult', () => {
-    expect(buildDiscoverParams({ genres: [], from: null, to: null, adult: false }, 'movie', 1)).toEqual({
+    expect(buildDiscoverParams({ ...base, genres: [] }, 'movie', 1)).toEqual({
       page: 1,
       include_adult: false,
     })

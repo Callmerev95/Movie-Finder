@@ -1,5 +1,5 @@
 import { get, TmdbError } from './tmdb-fetch'
-import type { DetailData, Genre, Item, Paged, Filters, MediaType, ProviderSections } from './types'
+import type { DetailData, Genre, Item, Paged, Filters, MediaType, Provider, ProviderSections } from './types'
 
 interface RawMultiResult {
   id: number
@@ -88,6 +88,10 @@ interface RawProviders {
   results?: { ID?: { flatrate?: RawProvider[]; rent?: RawProvider[]; buy?: RawProvider[] } }
 }
 
+interface RawProviderList {
+  results: RawProvider[]
+}
+
 function year(date?: string): number | null {
   if (!date) return null
   const y = Number(date.slice(0, 4))
@@ -120,6 +124,15 @@ export function buildDiscoverParams(filters: Filters, type: MediaType, page: num
   if (filters.genres.length > 0) params.with_genres = filters.genres.join(',')
   if (filters.from !== null) params['primary_release_date.gte'] = `${filters.from}-01-01`
   if (filters.to !== null) params['primary_release_date.lte'] = `${filters.to}-12-31`
+  if (filters.provider !== null) {
+    params.watch_region = 'ID'
+    params.with_watch_providers = filters.provider
+  }
+  if (filters.indonesia) {
+    // movie: bahasa asli id; tv: negara produksi ID (param bahasa tak ada di tv)
+    if (type === 'movie') params.with_original_language = 'id'
+    else params.with_origin_country = 'ID'
+  }
   if (type === 'tv') {
     // primary_release_date = first_air_date di discover tv
     params['first_air_date.gte'] = params['primary_release_date.gte']
@@ -145,6 +158,14 @@ export function searchByTitle(query: string, page = 1): Promise<Paged<Item>> {
 
 export function discover(filters: Filters, type: MediaType, page = 1): Promise<Paged<Item>> {
   return get<RawPaged>(`/discover/${type}`, buildDiscoverParams(filters, type, page)).then((r) => pagedOf(r, type))
+}
+
+export function providerList(type: MediaType): Promise<Provider[]> {
+  return get<RawProviderList>(`/watch/providers/${type}`, { watch_region: 'ID' }).then((r) =>
+    r.results
+      .map((p) => ({ id: p.provider_id, name: p.provider_name, logoPath: p.logo_path ?? null }))
+      .sort((a, b) => a.name.localeCompare(b.name, 'id-ID')),
+  )
 }
 
 export function trending(adult = false): Promise<Paged<Item>> {

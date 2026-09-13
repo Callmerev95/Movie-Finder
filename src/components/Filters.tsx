@@ -3,8 +3,8 @@ import { Filter, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { genreList } from '@/lib/tmdb'
-import type { Filters, Genre, MediaType } from '@/lib/types'
+import { genreList, providerList } from '@/lib/tmdb'
+import type { Filters, Genre, MediaType, Provider } from '@/lib/types'
 
 interface Props {
   type: MediaType
@@ -119,6 +119,16 @@ export function Filters({ type, filters, onChange }: Props) {
       <label className="flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground">
         <input
           type="checkbox"
+          checked={filters.indonesia}
+          onChange={(e) => onChange({ filters: { ...filters, indonesia: e.target.checked } })}
+          className="size-3.5 cursor-pointer accent-[var(--primary)]"
+        />
+        Konten Indonesia
+      </label>
+
+      <label className="flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground">
+        <input
+          type="checkbox"
           checked={filters.adult}
           onChange={(e) => onChange({ filters: { ...filters, adult: e.target.checked } })}
           className="size-3.5 cursor-pointer accent-[var(--primary)]"
@@ -126,11 +136,16 @@ export function Filters({ type, filters, onChange }: Props) {
         Konten dewasa (18+)
       </label>
 
-      {(filters.genres.length > 0 || filters.from !== null || filters.to !== null || filters.adult) && (
+      <ProviderSelect
+        value={filters.provider}
+        onChange={(provider) => onChange({ filters: { ...filters, provider } })}
+      />
+
+      {(filters.genres.length > 0 || filters.from !== null || filters.to !== null || filters.adult || filters.provider !== null || filters.indonesia) && (
         <Button
           variant="ghost"
           size="xs"
-          onClick={() => onChange({ filters: { genres: [], from: null, to: null, adult: false } })}
+          onClick={() => onChange({ filters: { genres: [], from: null, to: null, adult: false, provider: null, indonesia: false } })}
         >
           <X className="size-3" aria-hidden="true" />
           Hapus filter
@@ -144,6 +159,44 @@ function numYear(v: string): number | null {
   if (!v) return null
   const n = Number(v)
   return Number.isInteger(n) && n >= 1900 && n <= 2100 ? n : null
+}
+
+function ProviderSelect({ value, onChange }: { value: number | null; onChange: (v: number | null) => void }) {
+  const [providers, setProviders] = useState<Provider[]>([])
+
+  useEffect(() => {
+    // provider ID konsisten lintas type — fetch movie list cukup, tak perlu per-type
+    let active = true
+    providerList('movie')
+      .then((p) => {
+        if (active) setProviders(p)
+      })
+      .catch(() => {
+        if (active) setProviders([])
+      })
+    return () => {
+      active = false
+    }
+  }, [])
+
+  return (
+    <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+      <span className="sr-only">Provider streaming</span>
+      <select
+        value={value ?? ''}
+        onChange={(e) => onChange(e.target.value ? Number(e.target.value) : null)}
+        aria-label="Provider streaming"
+        className="h-7 cursor-pointer rounded-lg border border-border bg-muted px-2 text-xs text-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+      >
+        <option value="">Semua provider</option>
+        {providers.map((p) => (
+          <option key={p.id} value={p.id}>
+            {p.name}
+          </option>
+        ))}
+      </select>
+    </label>
+  )
 }
 
 // Teks lokal bebas diketik ("19", "199") — commit angka valid-or-null ke filter.

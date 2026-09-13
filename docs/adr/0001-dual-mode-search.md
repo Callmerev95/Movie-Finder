@@ -24,8 +24,11 @@ Dual-mode dengan satu grid:
   per-type dan pilihan genre di-reset saat ganti type (ID tidak kompatibel).
 - Submit teks saat filter aktif → pindah Search mode, filter di-clear + toast.
   Satu mode aktif dalam satu waktu.
-- URL params eksplisit: `?q&type&genres&from&to&adult&mode`. `page` tidak
-  di URL — load-more pakai counter state, shareable URL selalu page 1.
+- URL params eksplisit: `?q&type&genres&from&to&adult&provider&indonesia&mode`. `page`
+  tidak di URL — load-more pakai counter state, shareable URL selalu page 1.
+  `provider` = ID provider streaming (region watch ID), `indonesia` = konten
+  produksi Indonesia (movie: `with_original_language=id`; tv:
+  `with_origin_country=ID` — dispatch per-type, pattern sama tahun).
 - API key `VITE_TMDB_API_KEY` client-side by design (key TMDb gratis &
   replaceable; upgrade path: proxy Vercel function bila disalahgunakan).
 

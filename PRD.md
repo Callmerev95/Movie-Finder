@@ -19,7 +19,7 @@
 | # | Story | Acceptance Criteria |
 |---|-------|---------------------|
 | US-1 | Sebagai pengguna, saya ingin mencari film/serial by judul agar cepat menemukan kandidat tontonan. | Debounce 300ms; hasil pertama < 1.5s; hasil `person` dibuang; tampil poster, judul, tahun, Skor TMDb, badge type (Film/Serial); load-more pagination 20/halaman. Mode Search via `/search/multi`. |
-| US-2 | Sebagai pengguna, saya ingin filter genre & tahun agar mempersempit hasil. | Filter genre multi-select + rentang tahun (Dari/Sampai); Mode Discover via `/discover/movie|tv`, default type Film dengan toggle Serial; genre list per-type, pilihan reset saat ganti type (genre ID beda per type); submit teks saat filter aktif → switch Search mode + clear filter + toast; state filter tersimpan di URL (shareable, back button berfungsi). Lihat ADR 0001. |
+| US-2 | Sebagai pengguna, saya ingin filter genre & tahun agar mempersempit hasil. | Filter genre multi-select + rentang tahun (Dari/Sampai); Mode Discover via `/discover/movie|tv`, default type Film dengan toggle Serial; genre list per-type, pilihan reset saat ganti type (genre ID beda per type); filter provider streaming single-select (region ID) + toggle Konten Indonesia (movie: bahasa asli id; tv: negara produksi ID); submit teks saat filter aktif → switch Search mode + clear filter + toast; state filter tersimpan di URL (shareable, back button berfungsi). Lihat ADR 0001. |
 | US-3 | Sebagai pengguna, saya ingin melihat detail item agar memutuskan menonton. | Halaman detail: poster besar, sinopsis, genre, durasi (film) / jumlah season (serial), rating, cast utama, embed trailer YouTube (jika ada), tempat menonton per region Indonesia (Langganan/Sewa/Beli; sembunyikan bila tidak ada — ADR 0002). Endpoint dispatch by type: `/movie/{id}` vs `/tv/{id}` dengan `append_to_response=videos,credits,watch/providers`. |
 | US-4 | Sebagai pengguna, saya ingin menyimpan item ke watchlist agar tidak lupa. | Tombol add/remove dari hasil & detail; watchlist bertahan setelah refresh; badge jumlah item di navigasi. |
 | US-5 | Sebagai pengguna, saya ingin memberi rating 1–5 agar mencatat opini pribadi. | Rating di halaman detail otomatis add item ke watchlist + set rating (satu langkah); di watchlist bisa edit/clear rating; tersimpan persisten. |
@@ -68,7 +68,7 @@ SPA (Browser)
  └─ Watchlist → localStorage key "movie-finder:watchlist" (Context + useLocalStorage hook)
 ```
 
-- URL params eksplisit: `?q&type&genres&from&to&adult&mode`; `page` tidak di URL (load-more state counter). Toggle adult default OFF.
+- URL params eksplisit: `?q&type&genres&from&to&adult&provider&indonesia&mode`; `page` tidak di URL (load-more state counter). Toggle adult default OFF.
 
 - **API client** (`lib/tmdb.ts`): search multi + detail dispatch + in-session `Map` cache + pagination + error/retry state.
 - **Watchlist store** (`lib/useWatchlist.ts`): React Context + localStorage; operasi add/remove/rate/sort.

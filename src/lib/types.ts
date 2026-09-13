@@ -26,6 +26,8 @@ export interface Filters {
   from: number | null
   to: number | null
   adult: boolean
+  provider: number | null
+  indonesia: boolean
 }
 
 export type SearchMode = 'search' | 'discover'

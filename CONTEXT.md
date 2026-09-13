@@ -43,7 +43,8 @@ Mode pencarian berdasar filter genre & rentang tahun via endpoint per-type TMDb.
 _Avoid_: Jelajah
 
 **Filter**:
-Kondisi Discover: genre (multi), rentang tahun, type toggle, toggle adult.
+Kondisi Discover: genre (multi), rentang tahun, type toggle, toggle adult,
+provider streaming (satu), toggle Konten Indonesia.
 _Avoid_: Sorting
 
 **Type**:
@@ -60,5 +61,13 @@ _Avoid_: Mode Pencarian, rekomendasi
 
 **Provider Streaming**:
 Layanan tempat sebuah Item dapat ditonton di region Indonesia, dalam
-kategori Langganan, Sewa, atau Beli. Ditampilkan di halaman detail saja.
+kategori Langganan, Sewa, atau Beli. Ditampilkan di halaman detail saja;
+sebagai Filter Discover berarti: hasil terbatas ke item yang tersedia di
+provider tersebut.
 _Avoid_: Platform, where-to-watch
+
+**Konten Indonesia**:
+Filter Discover untuk item produksi Indonesia — Film berbahasa asli
+Indonesia atau Serial berproduksi Indonesia. Satu toggle, kriteria
+berbeda per Type.
+_Avoid_: Film lokal (untuk filter)

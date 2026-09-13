@@ -11,7 +11,7 @@ describe('parseUrlState', () => {
   it('filter aktif → mode discover', () => {
     const s = parseUrlState(new URLSearchParams('?genres=28,35&from=1990&to=2000'))
     expect(s.mode).toBe('discover')
-    expect(s.filters).toEqual({ genres: [28, 35], from: 1990, to: 2000, adult: false })
+    expect(s.filters).toEqual({ genres: [28, 35], from: 1990, to: 2000, adult: false, provider: null, indonesia: false })
   })
 
   it('mode discover param eksplisit + type tv + adult', () => {
@@ -44,7 +44,7 @@ describe('serializeUrlState', () => {
       mode: 'search',
       query: 'batman',
       type: 'movie',
-      filters: { genres: [28], from: null, to: null, adult: false },
+      filters: { genres: [28], from: null, to: null, adult: false, provider: null, indonesia: false },
     })
     expect(s).toBe('?mode=search&q=batman')
   })
@@ -54,7 +54,7 @@ describe('serializeUrlState', () => {
       mode: 'discover',
       query: '',
       type: 'tv',
-      filters: { genres: [16, 10759], from: 2020, to: 2024, adult: true },
+      filters: { genres: [16, 10759], from: 2020, to: 2024, adult: true, provider: null, indonesia: false },
     })
     expect(s).toBe('?mode=discover&type=tv&genres=16,10759&from=2020&to=2024&adult=1')
   })
@@ -64,7 +64,7 @@ describe('serializeUrlState', () => {
       mode: 'discover',
       query: '',
       type: 'movie',
-      filters: { genres: [], from: null, to: null, adult: false },
+      filters: { genres: [], from: null, to: null, adult: false, provider: null, indonesia: false },
     })
     expect(s).toBe('?mode=discover&type=movie')
   })
@@ -74,13 +74,13 @@ describe('serializeUrlState', () => {
       mode: 'discover' as const,
       query: '',
       type: 'tv' as const,
-      filters: { genres: [10759], from: 2015, to: null, adult: false },
+      filters: { genres: [10759], from: 2015, to: null, adult: false, provider: 8, indonesia: true },
     }
     expect(parseUrlState(new URLSearchParams(serializeUrlState(state)))).toEqual({
       mode: 'discover',
       query: '',
       type: 'tv',
-      filters: { genres: [10759], from: 2015, to: null, adult: false },
+      filters: { genres: [10759], from: 2015, to: null, adult: false, provider: 8, indonesia: true },
     })
   })
 })

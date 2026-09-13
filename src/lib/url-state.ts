@@ -16,7 +16,10 @@ export function parseUrlState(params: URLSearchParams): UrlState {
   const to = yearParam(params.get('to'))
   const q = params.get('q') ?? ''
   const type = params.get('type') === 'tv' ? 'tv' : 'movie'
-  const hasFilters = genres.length > 0 || from !== null || to !== null
+  const providerRaw = Number(params.get('provider'))
+  const provider = Number.isInteger(providerRaw) && providerRaw > 0 ? providerRaw : null
+  const indonesia = params.get('indonesia') === '1'
+  const hasFilters = genres.length > 0 || from !== null || to !== null || provider !== null || indonesia
   const modeParam = params.get('mode')
   const mode: SearchMode =
     modeParam === 'discover' || modeParam === 'search' ? modeParam : q ? 'search' : hasFilters ? 'discover' : 'search'
@@ -24,7 +27,7 @@ export function parseUrlState(params: URLSearchParams): UrlState {
     mode,
     query: q,
     type,
-    filters: { genres, from, to, adult: params.get('adult') === '1' },
+    filters: { genres, from, to, adult: params.get('adult') === '1', provider, indonesia },
   }
 }
 
@@ -45,6 +48,8 @@ export function serializeUrlState(state: UrlState): string {
     if (f.from !== null) params.set('from', String(f.from))
     if (f.to !== null) params.set('to', String(f.to))
     if (f.adult) params.set('adult', '1')
+    if (f.provider !== null) params.set('provider', String(f.provider))
+    if (f.indonesia) params.set('indonesia', '1')
   }
   const s = params.toString().replace(/%2C/g, ',')
   return s ? `?${s}` : ''
