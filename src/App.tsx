@@ -50,13 +50,24 @@ export default function App() {
     <WatchlistProvider>
       <ScrollToTop />
       <Nav />
-      <main className="mx-auto max-w-6xl px-4 pb-16">
+      <main className="mx-auto max-w-6xl px-4">
         <Routes>
           <Route path="/" element={<SearchPage />} />
           <Route path="/detail/:type/:id" element={<DetailPage />} />
           <Route path="/watchlist" element={<WatchlistPage />} />
         </Routes>
       </main>
+      <footer className="border-t border-border">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-6">
+          <p className="text-xs text-muted-foreground">© 2026 Movie Finder</p>
+          <a
+            href="https://www.themoviedb.org/"
+            className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+          >
+            Data oleh TMDb
+          </a>
+        </div>
+      </footer>
       <Toaster />
     </WatchlistProvider>
   )
