@@ -3,3 +3,4 @@ dist
 .env.local
 .env
 .DS_Store
+AGENTS.md
