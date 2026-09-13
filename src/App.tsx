@@ -63,11 +63,10 @@ export default function App() {
           <p className="text-xs text-muted-foreground">© 2026 Movie Finder</p>
           <a
             href="https://www.themoviedb.org/"
-            className="inline-flex items-center gap-2 rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+            className="inline-flex items-center rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
             aria-label="The Movie Database (TMDb)"
           >
             <img src={tmdbLogo} alt="" width={91} height={7} className="h-6 w-auto" />
-            <span className="text-xs text-muted-foreground">Data oleh TMDb</span>
           </a>
         </div>
       </footer>
