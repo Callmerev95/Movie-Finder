@@ -273,16 +273,37 @@ export default function DetailPage() {
           {data.cast.length > 0 && (
             <section className="mt-6">
               <h2 className="text-sm font-medium">Pemain utama</h2>
-              <ul className="mt-2 flex flex-wrap gap-x-6 gap-y-2">
+              <ul className="mt-3 flex flex-wrap gap-4">
                 {data.cast.map((c) => (
-                  <li key={c.id} className="text-sm">
+                  <li key={c.id}>
                     <Link
                       to={`/person/${c.id}`}
-                      className="cursor-pointer text-card-foreground/90 underline-offset-4 hover:underline focus-visible:ring-3 focus-visible:rounded-sm focus-visible:ring-ring/50 outline-none"
+                      className="group flex w-24 flex-col gap-1.5 cursor-pointer rounded-lg outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
                     >
-                      {c.name}
+                      {c.profilePath ? (
+                        <img
+                          src={imageUrl(c.profilePath, 'w185') ?? ''}
+                          alt={`Foto ${c.name}`}
+                          width={96}
+                          height={144}
+                          loading="lazy"
+                          decoding="async"
+                          className="aspect-3/4 w-full rounded-lg object-cover"
+                        />
+                      ) : (
+                        <div className="flex aspect-3/4 w-full items-center justify-center rounded-lg bg-muted text-[10px] text-muted-foreground">
+                          Tanpa foto
+                        </div>
+                      )}
+                      <span className="text-xs font-medium leading-tight group-hover:underline underline-offset-2">
+                        {c.name}
+                      </span>
+                      {c.character && (
+                        <span className="text-xs leading-tight text-muted-foreground line-clamp-2">
+                          {c.character}
+                        </span>
+                      )}
                     </Link>
-                    {c.character && <span className="text-muted-foreground"> sebagai {c.character}</span>}
                   </li>
                 ))}
               </ul>
