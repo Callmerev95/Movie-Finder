@@ -61,7 +61,7 @@ export default function App() {
         </Routes>
       </main>
       <footer className="border-t border-border">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-6">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-10">
           <p className="text-xs text-muted-foreground">© 2026 Movie Finder</p>
           <a
             href="https://www.themoviedb.org/"
