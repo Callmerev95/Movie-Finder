@@ -1,6 +1,7 @@
 import { Link, Route, Routes, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import { Clapperboard, Bookmark } from 'lucide-react'
+import tmdbLogo from './assets/tmdb-logo.svg'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Toaster } from '@/components/ui/toast'
@@ -62,9 +63,11 @@ export default function App() {
           <p className="text-xs text-muted-foreground">© 2026 Movie Finder</p>
           <a
             href="https://www.themoviedb.org/"
-            className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            className="inline-flex items-center gap-2 rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+            aria-label="The Movie Database (TMDb)"
           >
-            Data oleh TMDb
+            <img src={tmdbLogo} alt="" width={91} height={7} className="h-6 w-auto" />
+            <span className="text-xs text-muted-foreground">Data oleh TMDb</span>
           </a>
         </div>
       </footer>
