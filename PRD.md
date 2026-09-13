@@ -1,147 +1,356 @@
 # PRD — Movie Finder
 
-## 1. Executive Summary
+| Atribut | Nilai |
+|---|---|
+| Versi | 2.0 |
+| Status | MVP + v1.1 **selesai di-build** |
+| Owner | rev |
+| Repo | `Callmerev95/Movie-Finder` (public) |
+| Dokumen terkait | `DESIGN.md` (desain), `CONTEXT.md` (glossary), `AGENTS.md` (konvensi), `docs/adr/` (keputusan arsitektur) |
 
-- **Problem Statement**: Tidak ada tempat tunggal untuk mencari film/serial yang layak ditonton, melacak watchlist, dan memberi rating pribadi — pencarian tersebar, dan tracking tontonan tidak terdokumentasi.
-- **Proposed Solution**: SPA ringan (Vite + React + TypeScript, Tailwind + shadcn/ui) yang mencari film & serial via TMDb API — filter genre/tahun, halaman detail dengan poster + trailer — dengan watchlist & rating 1–5 tersimpan di localStorage. Nol DB, nol auth, deploy static Vercel.
-- **Success Criteria**:
-  - Hasil search tampil <= 1.5s sejak submit.
-  - Watchlist + rating 100% persisten setelah refresh / tutup browser (localStorage).
-  - Lighthouse Performance >= 90, Accessibility >= 95.
-  - Nol error console pada happy path: search → detail → add watchlist → rating.
+---
 
-## 2. User Experience & Functionality
+## 1. Ringkasan Eksekutif
 
-**Persona**: Penonton kasual — 1 browser, tanpa akun, tanpa login.
+### 1.1 Problem
 
-### User Stories & Acceptance Criteria
+Tidak ada satu tempat untuk mencari film/serial yang layak ditonton, melacak
+watchlist, dan mencatat opini pribadi. Pencarian tersebar di banyak layanan,
+dan daftar tontonan tidak terdokumentasi.
 
-| # | Story | Acceptance Criteria |
-|---|-------|---------------------|
-| US-1 | Sebagai pengguna, saya ingin mencari film/serial by judul agar cepat menemukan kandidat tontonan. | Debounce 300ms; hasil pertama < 1.5s; hasil `person` dibuang; tampil poster, judul, tahun, Skor TMDb, badge type (Film/Serial); load-more pagination 20/halaman. Mode Search via `/search/multi`. |
-| US-2 | Sebagai pengguna, saya ingin filter genre & tahun agar mempersempit hasil. | Filter genre multi-select + rentang tahun (Dari/Sampai); Mode Discover via `/discover/movie|tv`, default type Film dengan toggle Serial; genre list per-type, pilihan reset saat ganti type (genre ID beda per type); filter provider streaming single-select (region ID) + toggle Konten Indonesia (movie: bahasa asli id; tv: negara produksi ID); submit teks saat filter aktif → switch Search mode + clear filter + toast; state filter tersimpan di URL (shareable, back button berfungsi). Lihat ADR 0001. |
-| US-3 | Sebagai pengguna, saya ingin melihat detail item agar memutuskan menonton. | Halaman detail: poster besar, sinopsis, genre, durasi (film) / jumlah season (serial), rating, cast utama, embed trailer YouTube (jika ada), tempat menonton per region Indonesia (Langganan/Sewa/Beli; sembunyikan bila tidak ada — ADR 0002). Endpoint dispatch by type: `/movie/{id}` vs `/tv/{id}` dengan `append_to_response=videos,credits,watch/providers`. |
-| US-4 | Sebagai pengguna, saya ingin menyimpan item ke watchlist agar tidak lupa. | Tombol add/remove dari hasil & detail; watchlist bertahan setelah refresh; badge jumlah item di navigasi. |
-| US-5 | Sebagai pengguna, saya ingin memberi rating 1–5 agar mencatat opini pribadi. | Rating di halaman detail otomatis add item ke watchlist + set rating (satu langkah); di watchlist bisa edit/clear rating; tersimpan persisten. |
-| US-6 | Sebagai pengguna, saya ingin mengelola watchlist agar rapi. | Hapus item; sort by tanggal ditambah (default) / rating / judul; empty state jelas saat list kosong. |
-| US-7 | Sebagai pengguna, saya ingin menandai item di watchlist yang sudah saya tonton agar tidak lupa. | Chip "Tandai ditonton" per item di WatchlistPage + saat item sudah tersimpan di DetailPage; default belum ditonton, persist di localStorage bersama metadata watchlist. |
+### 1.2 Solusi
 
-### Model item watchlist
+SPA ringan untuk mencari film & serial via TMDb API v3, dengan:
+
+- **Dua mode pencarian**: teks (Search) dan filter (Discover).
+- **Halaman detail** lengkap: poster, backdrop, sinopsis, trailer, pemeran, dan
+  tempat menonton per region Indonesia.
+- **Watchlist** pribadi dengan rating 1–5 dan penanda "Ditonton", tersimpan di
+  `localStorage` — nol akun, nol database, nol backend.
+- **Deploy static** di Vercel.
+
+### 1.3 Success Criteria
+
+| Metrik | Target |
+|---|---|
+| Waktu tampil hasil search | ≤ 1.5 detik sejak submit |
+| Persistensi watchlist + rating | 100% setelah refresh / tutup browser |
+| Lighthouse Performance | ≥ 90 |
+| Lighthouse Accessibility | ≥ 95 |
+| Error konsol pada happy path (search → detail → add → rating) | 0 |
+| Unit test pure functions | Hijau penuh (`npm test`) |
+
+---
+
+## 2. Persona
+
+**Penonton kasual** — satu browser, tanpa akun, tanpa login. Mencari kandidat
+tontonan cepat, menyimpan yang menarik, dan menandai yang sudah ditonton.
+Mobilitas antar perangkat bukan kebutuhan (lihat Roadmap v2.0).
+
+---
+
+## 3. Ruang Lingkup
+
+### 3.1 In Scope
+
+- Cari film & serial by judul dan by filter (genre, tahun, provider, konten Indonesia, adult).
+- Detail item + trailer + tempat menonton.
+- Watchlist: tambah, hapus (dengan undo), rating, tandai ditonton, sort, ekspor/impor JSON.
+- Halaman Orang (profil pemeran/sutradara + filmografi).
+- Trending mingguan sebagai landing.
+
+### 3.2 Non-Goals
+
+- Tidak ada akun/login (penyimpanan `localStorage` saja di MVP).
+- Tidak ada rekomendasi berbasis selera/mood.
+- Tidak ada review panjang — cukup rating 1–5.
+- Tidak ada sinkronisasi multi-device (dijadwalkan v2.0).
+- Tidak ada light mode — aplikasi dark-only.
+
+---
+
+## 4. User Flow
+
+```mermaid
+flowchart TD
+    A["Landing /"] -->|mode Search, tanpa query| B["Trending Minggu Ini"]
+    A -->|ketik judul, debounce 300ms| C["Grid hasil Search"]
+    A -->|set filter genre/tahun/provider/Indonesia| D["Grid hasil Discover"]
+    B -->|klik poster| E["Halaman Detail"]
+    C -->|klik poster| E
+    D -->|klik poster| E
+    E -->|rating 1-5| F["Auto-add ke Watchlist + set rating"]
+    E -->|klik Simpan| F
+    E -->|klik pemeran| G["Halaman Orang"]
+    G -->|klik Item| E
+    F --> H["Halaman Watchlist"]
+    H -->|edit rating / tandai ditonton / hapus+undo / ekspor-impor| H
+```
+
+### Alur utama
+
+1. **Discover cepat** — landing menampilkan "Trending Minggu Ini". Klik poster
+   langsung ke detail.
+2. **Search** — ketik judul, hasil muncul ≤ 1.5s dengan debounce 300ms. Load
+   more untuk halaman berikutnya.
+3. **Filter (Discover)** — pilih genre, tahun, provider, atau Konten Indonesia.
+   State tersimpan di URL sehingga bisa dibagikan dan tombol back bekerja.
+4. **Detail** — baca sinopsis, tonton trailer, lihat pemeran, cek tempat
+   menonton. Beri rating langsung (auto masuk watchlist) atau simpan.
+5. **Orang** — klik pemeran di detail untuk lihat biografi + filmografi.
+6. **Kelola watchlist** — sort, edit rating, tandai ditonton, hapus (bisa
+   urungkan), ekspor/impor JSON sebagai cadangan.
+
+---
+
+## 5. Fitur & User Stories
+
+Semua fitur berikut **sudah diimplementasikan** (status ✅). `ADR` merujuk
+keputusan arsitektur di `docs/adr/`.
+
+| ID | Fitur | Acceptance Criteria | Status |
+|---|---|---|---|
+| US-1 | **Search by judul** | Debounce 300ms; hasil pertama < 1.5s; hasil `person` dibuang; tampil poster, judul, tahun, Skor TMDb, badge type (Film/Serial); pagination 20/halaman. Endpoint `/search/multi`. | ✅ |
+| US-2 | **Discover / filter** | Filter genre multi-select + rentang tahun (Dari/Sampai) + provider streaming single-select (region ID) + toggle Konten Indonesia + toggle adult (default OFF); type default Film dengan toggle Serial; genre list per-type dan reset saat ganti type; konten Indonesia sort terbaru dulu + cap tanggal hari ini; submit teks saat filter aktif → switch ke Search + clear filter + toast; state filter tersimpan di URL. Lihat ADR 0001. | ✅ |
+| US-3 | **Detail item** | Poster besar + backdrop, tagline, sinopsis, genre, durasi (Film) / jumlah season+episode (Serial), Skor TMDb, status tayang, cast utama (10), sutradara/pencipta/studio/jaringan, embed trailer YouTube (preferensi Trailer official → Teaser), link IMDb, tempat menonton per region Indonesia (Langganan/Sewa/Beli; sembunyikan bila kosong — ADR 0002). Endpoint dispatch `/movie/{id}` vs `/tv/{id}`. | ✅ |
+| US-4 | **Simpan ke watchlist** | Tombol add/remove dari hasil & detail; persisten setelah refresh; badge jumlah item di navigasi; hapus menampilkan toast dengan undo (kembalikan snapshot persis). | ✅ |
+| US-5 | **Rating 1–5** | Rating di detail otomatis add item ke watchlist + set rating dalam satu langkah; di watchlist bisa edit/clear; klik bintang sama = clear; persisten. | ✅ |
+| US-6 | **Kelola watchlist** | Sort by tanggal ditambah (default) / rating / judul; hapus item; ekspor/impor JSON (merge anti-duplikat, item existing menang; validasi `parseWatchlist`; file korup → pesan error); empty state jelas. | ✅ |
+| US-7 | **Tandai ditonton** | Chip "Tandai ditonton" per item di WatchlistPage + di DetailPage saat item tersimpan; default belum ditonton; persisten di `localStorage`. | ✅ |
+| US-8 | **Halaman Orang** | Klik pemeran di detail → halaman profil: foto, biografi, departemen, tanggal lahir/kematian, tempat lahir; filmografi "Paling dikenal dari" (maks 24 item, sort Skor TMDb desc, dedup id+type). Endpoint `/person/{id}` dengan `append_to_response=combined_credits`. | ✅ |
+| US-9 | **Trending landing** | Grid "Trending Minggu Ini" tampil saat belum ada pencarian; 20 item fixed tanpa load-more; hilang saat search, kembali saat clear; bukan Mode Pencarian (nol URL param). Endpoint `/trending/all/week`. | ✅ |
+
+---
+
+## 6. Model Data
+
+### 6.1 Item
 
 ```ts
-{
-  type: 'movie' | 'tv',
-  tmdbId: number,
-  title: string,
-  posterPath: string | null,
-  addedAt: string,      // ISO date
-  rating?: 1 | 2 | 3 | 4 | 5,
-  voteAverage: number
+interface Item {
+  type: 'movie' | 'tv'
+  tmdbId: number
+  title: string
+  posterPath: string | null
+  year: number | null
+  score: number | null   // Skor TMDb (vote_average), apa adanya
 }
 ```
 
-### Non-Goals
+### 6.2 WatchlistEntry
 
-- Tidak ada akun/login (MVP localStorage only).
-- Tidak ada rekomendasi berbasis selera/mood.
-- Tidak ada review panjang — rating 1–5 saja.
-- Tidak ada sinkronisasi multi-device (v2.0).
-
-## 3. AI System Requirements
-
-N/A — tidak ada fitur AI.
-
-## 4. Technical Specifications
-
-### Stack
-
-- Vite + React + TypeScript
-- TailwindCSS + shadcn/ui
-- react-router-dom (route `/` search, `/movie/:type/:id` detail, `/watchlist`)
-
-### Architecture / Data Flow
-
-```
-SPA (Browser)
- ├─ Search    → TMDb /search/multi (filter hasil movie|tv, buang person) — mode Search
- ├─ Discover  → TMDb /discover/movie|tv + /genre/{type}/list — mode Discover, default Film
- ├─ Detail    → TMDb /movie/{id} | /tv/{id} (append_to_response=videos,credits), dispatch by type
- └─ Watchlist → localStorage key "movie-finder:watchlist" (Context + useLocalStorage hook)
+```ts
+interface WatchlistEntry extends Item {
+  addedAt: string          // ISO date
+  rating: number | null    // 1..5, null = belum dirating
+  watched: boolean         // default false
+}
 ```
 
-- URL params eksplisit: `?q&type&genres&from&to&adult&provider&indonesia&mode`; `page` tidak di URL (load-more state counter). Toggle adult default OFF.
+### 6.3 Filters
 
-- **API client** (`lib/tmdb.ts`): search multi + detail dispatch + in-session `Map` cache + pagination + error/retry state.
-- **Watchlist store** (`lib/useWatchlist.ts`): React Context + localStorage; operasi add/remove/rate/sort.
-- **API key**: `VITE_TMDB_API_KEY` env var via `import.meta.env` — client-side by design (TMDb key gratis & replaceable; jangan commit `.env`).
+```ts
+interface Filters {
+  genres: number[]
+  from: number | null
+  to: number | null
+  adult: boolean
+  provider: number | null
+  indonesia: boolean
+}
+```
 
-### Integration Points
+Penyimpanan Watchlist: `localStorage` dengan key `movie-finder:watchlist`,
+diakses lewat React Context (`useWatchlist`). Parsing anti-korup
+(`parseWatchlist`): data korup/format lama → `[]`, tidak pernah crash.
 
-- TMDb API v3 (gratis, perlu API key dari themoviedb.org).
-- Nol DB, nol auth, nol backend.
+---
 
-### Security & Privacy
+## 7. Kebutuhan Teknis
 
-- Tidak ada data pribadi yang dikirim ke mana pun — watchlist hanya tersimpan di browser pengguna.
-- API key terekspos di client bundle (accepted risk; mitigasi upgrade path: proxy Vercel function).
+### 7.1 Stack
 
-## 5. Risks & Roadmap
+| Lapisan | Teknologi |
+|---|---|
+| Build | Vite 8 |
+| UI | React 19 + TypeScript 7 (strict) |
+| Style | Tailwind CSS v4 + shadcn/ui (style `base-nova`, Base UI primitives) |
+| Routing | react-router-dom v7 |
+| Ikon | lucide-react (SVG, nol emoji) |
+| Font | Geist Variable (`@fontsource-variable/geist`) |
+| Test | Vitest (pure functions di `src/lib/`) |
 
-### Phased Rollout
+### 7.2 Arsitektur & Data Flow
 
-- **MVP**: US-1 s/d US-6 + trending landing (`/trending/all/week`) — search film+serial, filter genre/tahun, detail+trailer+tempat menonton, watchlist, rating, sort.
-- **v1.1**: Export/import watchlist JSON (backup anti-hilang); dark mode. — **SELESAI (export/import)**: tombol Ekspor/Impor di WatchlistPage; merge anti-duplikat, item existing menang; validasi pakai `parseWatchlist`; dark mode sudah default (dark-only).
-- **v2.0**: Migrasi ke Supabase Auth + Postgres untuk persist lintas device — skema `watchlist(user_id, type, tmdb_id, rating, added_at)` + RLS.
+```
+Browser SPA
+ ├─ Landing/Trending → TMDb /trending/all/week
+ ├─ Search          → TMDb /search/multi (buang person, mode Search)
+ ├─ Discover        → TMDb /discover/{movie|tv} + /genre/{type}/list (mode Discover, default Film)
+ ├─ Detail          → TMDb /{movie|tv}/{id} + append_to_response=videos,credits,watch/providers
+ ├─ Person          → TMDb /person/{id} + append_to_response=combined_credits
+ └─ Watchlist       → localStorage (Context + pure ops di lib/watchlist.ts)
+```
 
-### Technical Risks
+**Prinsip pemisahan**: seluruh logika fetch/parse/serialisasi hidup di
+`src/lib/` sebagai *pure functions*; komponen hanya render + memanggil hook.
+Nol logika bisnis di komponen.
+
+### 7.3 Endpoint TMDb (API v3)
+
+| Fungsi | Endpoint | Catatan |
+|---|---|---|
+| Search teks | `/search/multi` | `include_adult=false` |
+| Discover | `/discover/movie` / `/discover/tv` | param dilihat di ADR 0001 |
+| Genre list | `/genre/movie/list` / `/genre/tv/list` | ID genre beda per type |
+| Detail | `/movie/{id}` / `/tv/{id}` | `append_to_response=videos,credits,watch/providers`, `include_video_language=id,en,null` |
+| Provider list | `/watch/providers/{movie\|tv}?watch_region=ID` | diurut nama id-ID |
+| Trending | `/trending/all/week` | — |
+| Person | `/person/{id}` | `append_to_response=combined_credits` |
+
+Gambar: `https://image.tmdb.org/t/p/{size}{path}`.
+
+**Cache & error**: in-session `Map` cache + kelas `TmdbError` untuk error state
+yang ramah. Region provider hardcoded `ID`.
+
+### 7.4 URL State (shareable & back-button-safe)
+
+- Param eksplisit: `?q&type&genres&from&to&adult&provider&indonesia&mode`.
+- `page` **tidak** disimpan di URL — counter load-more state lokal.
+- `serialize` memakai decode koma manual (`%2C` → `,`) agar URL tetap terbaca.
+- Parse dan serialize terpusat di `lib/url-state.ts` (pure, teruji).
+
+```
+/                      → landing (Trending)
+/?q=interstellar       → Search
+/?mode=discover&type=movie&genres=28,878&provider=8 → Discover
+/detail/movie/27205    → Detail Film
+/detail/tv/31917       → Detail Serial
+/person/1245           → Halaman Orang
+/watchlist             → Watchlist
+```
+
+### 7.5 Konfigurasi
+
+- API key: `import.meta.env.VITE_TMDB_API_KEY` — **jangan hardcode, jangan
+  commit `.env`**. Variabel diisi di `.env.local` (lokal) dan environment
+  variable Vercel (produksi).
+- Key ada di client by design (ADR 0001): key TMDb gratis & dapat diganti.
+
+---
+
+## 8. Desain & UX
+
+Arah estetika **"Cinema Quiet"** — gelap sinematik, senyap, poster jadi
+satu-satunya elemen hidup. Lihat `DESIGN.md` untuk spesifikasi penuh
+(tipografi Geist, token warna cinema-dark, grid poster 2:3, states,
+aksesibilitas). Ringkasan kunci:
+
+- Dark-only: `.dark` permanen di `<html>`, tanpa toggle tema.
+- Motion hanya menjawab aksi user; nol entrance animation grid; hormati
+  `prefers-reduced-motion`.
+- Semua kontrol keyboard-reachable; fokus ring terlihat; icon-only button
+  wajib `aria-label`; poster card = link (bukan `div`).
+- Empty/error state memakai copy yang mengajak, bukan dead-end.
+
+---
+
+## 9. Kualitas & Verifikasi
+
+| Perintah | Fungsi | Status |
+|---|---|---|
+| `npm run typecheck` | `tsc --noEmit`, wajib hijau | ✅ 0 error |
+| `npm test` | Vitest, pure functions di `src/lib/` | ✅ 50/50 |
+| `npm run build` | Produksi build | ✅ hijau |
+| `npm run dev` | Dev server | — |
+
+- Test murni untuk pure functions: URL builder, normalizer, watchlist ops,
+  filter parse. File test berdampingan `src/lib/*.test.ts`.
+- Happy path dismoke-test via browser (search → detail → add → rating).
+- Lighthouse target: Perf ≥ 90, A11y ≥ 95.
+
+---
+
+## 10. Keamanan & Privasi
+
+- Tidak ada data pribadi yang dikirim ke mana pun — watchlist hanya di browser
+  pengguna (`localStorage`).
+- API key terekspos di bundle (accepted risk): key TMDb gratis, dapat dirotasi;
+  mitigasi lain = proxy lewat Vercel function jika quota disalahgunakan.
+- Tidak ada credentials, tidak ada input pengguna yang dievaluasi sebagai kode.
+
+---
+
+## 11. Risiko
 
 | Risiko | Dampak | Mitigasi |
 |---|---|---|
-| API key terekspos di bundle | Key disalahgunakan, quota habis | TMDb key gratis & replaceable; upgrade path: proxy Vercel function |
-| localStorage terhapus / ganti device | Watchlist hilang total | Ekspektasi jelas di UI; v1.1 export JSON |
-| Rate limit TMDb saat scroll cepat (±50 req/10s) | Search error 429 | Debounce, in-session cache, pagination 20/halaman |
-| TMDb down / key invalid | App mati total | Error state + retry sederhana |
+| API key terekspos di bundle | Key disalahgunakan, quota habis | Key TMDb gratis & replaceable; upgrade path proxy Vercel function |
+| `localStorage` terhapus / ganti device | Watchlist hilang | Ekspektasi di UI; ekspor/impor JSON (v1.1) |
+| Rate limit TMDb saat akses cepat (±50 req/10s) | Error 429 | Debounce, in-session cache, pagination 20/halaman |
+| TMDb down / key invalid | App tidak menampilkan hasil | Error state + retry; pesan "API key TMDb belum diatur" |
 
-## Struktur Repo
+---
+
+## 12. Roadmap
+
+| Fase | Cakupan | Status |
+|---|---|---|
+| **MVP** | US-1 s/d US-9 — search, filter, detail+trailer+tempat menonton, watchlist, rating, sort, trending landing, halaman Orang | ✅ Selesai |
+| **v1.1** | Ekspor/impor watchlist JSON (backup anti-hilang); dark-only dipertahankan sebagai desain | ✅ Selesai |
+| **v2.0** | Migrasi ke Supabase Auth + Postgres untuk persist lintas device — skema `watchlist(user_id, type, tmdb_id, rating, added_at, watched)` + RLS | Dipetakan |
+
+---
+
+## 13. Struktur Repo
 
 ```
 Movie-Finder/
 ├─ public/
 ├─ src/
+│  ├─ assets/              (logo TMDb)
 │  ├─ components/
-│  │  ├─ ui/            (shadcn: button, card, input, select, dialog, badge, toast)
+│  │  ├─ ui/               (shadcn: button, badge, card, input, select, toast, dst.)
 │  │  ├─ SearchBar.tsx
 │  │  ├─ Filters.tsx
 │  │  ├─ ResultCard.tsx
-│  │  ├─ Detail.tsx
-│  │  ├─ Rating.tsx
-│  │  ├─ WatchlistItem.tsx
-│  │  └─ EmptyState.tsx
-│  ├─ lib/
-│  │  ├─ tmdb.ts
-│  │  ├─ useWatchlist.ts
-│  │  ├─ cache.ts
-│  │  └─ types.ts
+│  │  ├─ Stars.tsx
+│  │  └─ TrendingSection.tsx
+│  ├─ lib/                 (pure functions + hooks + fetch)
+│  │  ├─ types.ts
+│  │  ├─ tmdb.ts           (endpoint + normalize)
+│  │  ├─ tmdb-fetch.ts     (cache Map + TmdbError)
+│  │  ├─ watchlist.ts      (add/remove/rate/watched/sort/merge)
+│  │  ├─ url-state.ts      (parse/serialize URL)
+│  │  ├─ detail-info.ts
+│  │  ├─ format.ts
+│  │  ├─ toast.ts
+│  │  ├─ useWatchlist.tsx  (Context + localStorage)
+│  │  └─ *.test.ts
 │  ├─ pages/
 │  │  ├─ SearchPage.tsx
 │  │  ├─ DetailPage.tsx
+│  │  ├─ PersonPage.tsx
 │  │  └─ WatchlistPage.tsx
-│  ├─ App.tsx (router + layout + nav badge)
-│  └─ main.tsx
-├─ .env.example        (VITE_TMDB_API_KEY=)
-├─ vercel.json
+│  ├─ App.tsx              (router + nav + footer)
+│  ├─ main.tsx
+│  └─ index.css            (token cinema dark, dark-only)
+├─ docs/adr/               (0001 dual-mode search, 0002 where-to-watch)
+├─ .env.example            (VITE_TMDB_API_KEY=)
 ├─ package.json
 ├─ tsconfig.json
 └─ README.md
 ```
 
-## Checklist Eksekusi
+---
 
-1. Scaffold Vite + React + TS, install Tailwind, init shadcn/ui, react-router-dom.
-2. `lib/types.ts` + `lib/tmdb.ts` (search multi + detail dispatch + cache + abort).
-3. `lib/useWatchlist.ts` (Context + localStorage + rating + sort).
-4. Pages: SearchPage → DetailPage → WatchlistPage + components + layout nav.
-5. CI (typecheck + build + test), `.env.example`, Vercel config, README.
-6. Verifikasi: build hijau, Lighthouse, smoke flow via browser.
+## 14. Lampiran
 
-**Tindakan pengguna**: isi `VITE_TMDB_API_KEY` di `.env.local` (lokal) dan environment variable Vercel.
+- **Glossary**: `CONTEXT.md` — istilah kanonik (Watchlist, Rating, Ditonton,
+  Skor TMDb, Item, Film, Serial, Mode Pencarian, Search, Discover, Filter,
+  Type, Tahun, Trending, Provider Streaming, Konten Indonesia, Orang).
+- **ADR**: `docs/adr/0001-dual-mode-search.md`,
+  `docs/adr/0002-where-to-watch.md`.
+- **Penyiapan awal** (sekali): isi `VITE_TMDB_API_KEY` di `.env.local` (lokal)
+  dan environment variable Vercel (produksi).
