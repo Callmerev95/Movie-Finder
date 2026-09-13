@@ -6,7 +6,7 @@
 | Status | MVP + v1.1 **selesai di-build** |
 | Owner | rev |
 | Repo | `Callmerev95/Movie-Finder` (public) |
-| Dokumen terkait | `DESIGN.md` (desain), `CONTEXT.md` (glossary), `AGENTS.md` (konvensi), `docs/adr/` (keputusan arsitektur) |
+| Dokumen terkait | `DESIGN.md` (desain), `CONTEXT.md` (glossary), `docs/adr/` (keputusan arsitektur) |
 
 ---
 

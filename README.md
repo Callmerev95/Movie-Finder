@@ -86,7 +86,6 @@ Repo ini siap deploy static di Vercel — SPA rewrite sudah dikonfigurasi
 | [`PRD.md`](PRD.md) | Kebutuhan, user stories, arsitektur, roadmap |
 | [`DESIGN.md`](DESIGN.md) | Arah visual "Cinema Quiet", token, states, a11y |
 | [`CONTEXT.md`](CONTEXT.md) | Glossary istilah kanonik |
-| [`AGENTS.md`](AGENTS.md) | Konvensi pengerjaan untuk agen AI |
 | `docs/adr/` | Keputusan arsitektur (0001 dual-mode search, 0002 where-to-watch) |
 
 ## Catatan
