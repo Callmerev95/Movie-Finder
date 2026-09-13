@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { Clapperboard, CornerDownLeft, Loader2, Search, Bookmark } from 'lucide-react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { imageUrl, searchByTitle } from '@/lib/tmdb'
 import type { Item } from '@/lib/types'
 
@@ -131,18 +130,6 @@ export function CommandPalette() {
 
   return (
     <>
-      <Button
-        variant="ghost"
-        size="sm"
-        aria-label="Buka perintah cepat"
-        onClick={() => setOpen(true)}
-        className="text-muted-foreground"
-      >
-        <Search className="size-4" aria-hidden="true" />
-        <span className="hidden sm:inline">Cari</span>
-        <kbd className="hidden rounded border border-border bg-muted px-1.5 py-0.5 text-[10px] md:inline">⌘K</kbd>
-      </Button>
-
       <Dialog open={open} onOpenChange={(o) => (o ? setOpen(true) : close())}>
       <DialogContent
         showCloseButton={false}

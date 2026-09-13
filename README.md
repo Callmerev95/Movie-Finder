@@ -8,8 +8,8 @@ browser. Tanpa akun, tanpa database, tanpa backend.
 - **Dua mode pencarian** — ketik judul (Search) atau pakai filter genre, tahun,
   provider streaming, dan Konten Indonesia (Discover). State pencarian tersimpan
   di URL: bisa dibagikan, tombol back bekerja.
-- **Command palette `⌘K`** — cari judul & lompat ke halaman dari mana saja;
-  full-keyboard, hasil mini dengan poster langsung ke detail.
+- **Command palette `⌘K`** — power-user shortcut: cari judul & lompat ke halaman
+  dari mana saja; full-keyboard, hasil mini dengan poster langsung ke detail.
 - **Detail lengkap** — poster, backdrop, sinopsis, trailer YouTube, pemeran,
   tempat menonton di Indonesia, link IMDb.
 - **Watchlist pribadi** — tambah/hapus (dengan undo), rating 1–5, tandai

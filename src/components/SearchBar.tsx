@@ -31,8 +31,16 @@ export function SearchBar({ initial, onSubmit }: { initial: string; onSubmit: (q
           onChange={(e) => setText(e.target.value)}
           placeholder="Cari judul film atau serial…"
           aria-label="Cari judul film atau serial"
-          className="ps-9"
+          className="ps-9 pe-12"
         />
+        {!text && (
+          <kbd
+            aria-hidden="true"
+            className="pointer-events-none absolute end-3 top-1/2 hidden -translate-y-1/2 rounded border border-border bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground sm:block"
+          >
+            ⌘K
+          </kbd>
+        )}
       </div>
       <Button
         type="button"
