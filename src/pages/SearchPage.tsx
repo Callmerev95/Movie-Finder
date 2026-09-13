@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Clapperboard, RotateCcw } from 'lucide-react'
 import { discover, searchByTitle, TmdbError } from '@/lib/tmdb'
 import { parseUrlState, serializeUrlState } from '@/lib/url-state'
+import { toastInfo } from '@/lib/toast'
 import type { Item, MediaType } from '@/lib/types'
 
 export default function SearchPage() {
@@ -94,8 +95,7 @@ export default function SearchPage() {
         onSubmit={(q) => {
           const cleared = submitSearch(q)
           if (cleared) {
-            // toast ringan — state lokal, tanpa library
-            window.alert('Filter dihapus — pencarian judul tidak mendukung genre/tahun.')
+            toastInfo('Filter dihapus', 'Pencarian judul tidak mendukung genre/tahun.')
           }
         }}
       />
@@ -150,8 +150,14 @@ export default function SearchPage() {
             {total.toLocaleString('id-ID')} hasil
           </p>
           <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-            {items.map((item) => (
-              <ResultCard key={`${item.type}-${item.tmdbId}`} item={item} />
+            {items.map((item, i) => (
+              <div
+                key={`${item.type}-${item.tmdbId}`}
+                className="animate-in fade-in slide-in-from-bottom-2 duration-200 ease-out motion-reduce:animate-none"
+                style={{ animationDelay: `${Math.min(i * 30, 300)}ms` }}
+              >
+                <ResultCard item={item} />
+              </div>
             ))}
           </div>
           {items.length < total && (

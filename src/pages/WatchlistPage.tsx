@@ -7,6 +7,7 @@ import { imageUrl } from '@/lib/tmdb'
 import { sortWatchlist, type SortKey } from '@/lib/watchlist'
 import { useWatchlist } from '@/lib/useWatchlist'
 import { Stars } from '@/components/Stars'
+import { toastWithUndo } from '@/lib/toast'
 
 const SORTS: { key: SortKey; label: string }[] = [
   { key: 'added', label: 'Terbaru ditambah' },
@@ -15,7 +16,7 @@ const SORTS: { key: SortKey; label: string }[] = [
 ]
 
 export default function WatchlistPage() {
-  const { entries, rate, remove } = useWatchlist()
+  const { entries, rate, remove, add } = useWatchlist()
   const [sort, setSort] = useState<SortKey>('added')
   const sorted = useMemo(() => sortWatchlist(entries, sort), [entries, sort])
 
@@ -99,7 +100,12 @@ export default function WatchlistPage() {
               size="icon-sm"
               aria-label={`Hapus ${e.title} dari watchlist`}
               className="self-start text-destructive hover:bg-destructive/10"
-              onClick={() => remove({ type: e.type, tmdbId: e.tmdbId })}
+              onClick={() => {
+                remove({ type: e.type, tmdbId: e.tmdbId })
+                toastWithUndo('Dihapus dari watchlist', e.title, () => {
+                  add(e)
+                })
+              }}
             >
               <Trash2 className="size-4" aria-hidden="true" />
             </Button>

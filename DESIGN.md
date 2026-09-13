@@ -97,8 +97,11 @@ Detail page:
 ## 6. Motion
 
 - Durasi 150–250ms, ease-out. Satu kurva untuk semua.
-- `prefers-reduced-motion: reduce` → nol scale/brightness hover, nol toast slide; toast jadi muncul tanpa transisi.
-- Nol entrance animation beruntun per kartu.
+- Entrance: satu orchestrated reveal per konten load — grid hasil masuk dengan
+  fade+rise cepat, stagger mini 30ms/item capped total 300ms; detail page reveal
+  sekali saat data ready. Bukan repeat per aksi/section.
+- `prefers-reduced-motion: reduce` → entrance dinonaktifkan penuh (konten
+  langsung tampil); nol scale/brightness hover; toast muncul tanpa transisi.
 
 ## 7. Aksesibilitas floor
 

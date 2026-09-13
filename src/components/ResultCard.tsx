@@ -5,11 +5,25 @@ import { Button } from '@/components/ui/button'
 import { imageUrl } from '@/lib/tmdb'
 import type { Item } from '@/lib/types'
 import { useWatchlist } from '@/lib/useWatchlist'
+import { toastSuccess, toastWithUndo } from '@/lib/toast'
 
 export function ResultCard({ item }: { item: Item }) {
-  const { has, add, remove } = useWatchlist()
+  const { has, add, remove, entries } = useWatchlist()
   const saved = has(item)
   const poster = imageUrl(item.posterPath, 'w342')
+
+  const toggle = () => {
+    if (saved) {
+      const entry = entries.find((e) => e.type === item.type && e.tmdbId === item.tmdbId)
+      remove(item)
+      toastWithUndo('Dihapus dari watchlist', item.title, () => {
+        if (entry) add({ ...item, ...entry })
+      })
+    } else {
+      add(item)
+      toastSuccess('Ditambahkan ke watchlist', item.title)
+    }
+  }
 
   return (
     <article className="group/card relative">
@@ -50,7 +64,7 @@ export function ResultCard({ item }: { item: Item }) {
           size="icon-xs"
           variant={saved ? 'secondary' : 'default'}
           aria-label={saved ? `Hapus ${item.title} dari watchlist` : `Simpan ${item.title} ke watchlist`}
-          onClick={() => (saved ? remove(item) : add(item))}
+          onClick={toggle}
         >
           {saved ? <Check className="size-3" aria-hidden="true" /> : <Plus className="size-3" aria-hidden="true" />}
         </Button>

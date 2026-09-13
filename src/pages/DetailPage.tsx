@@ -7,6 +7,7 @@ import { Stars } from '@/components/Stars'
 import { detail, imageUrl, TmdbError } from '@/lib/tmdb'
 import type { DetailData } from '@/lib/types'
 import { useWatchlist } from '@/lib/useWatchlist'
+import { toastSuccess, toastWithUndo } from '@/lib/toast'
 
 export default function DetailPage() {
   const { type, id } = useParams()
@@ -53,6 +54,19 @@ export default function DetailPage() {
   const entry = wl.entries.find((e) => e.type === data.type && e.tmdbId === data.tmdbId)
   const poster = imageUrl(data.posterPath, 'w500')
   const backdrop = imageUrl(data.backdropPath, 'w1280')
+  const asItem = { type: data.type, tmdbId: data.tmdbId, title: data.title, posterPath: data.posterPath, year: data.year, score: data.score }
+
+  const toggleSave = () => {
+    if (saved) {
+      wl.remove(key)
+      toastWithUndo('Dihapus dari watchlist', data.title, () => {
+        if (entry) wl.add({ ...asItem, posterPath: entry.posterPath })
+      })
+    } else {
+      wl.add(asItem)
+      toastSuccess('Ditambahkan ke watchlist', data.title)
+    }
+  }
 
   const rate = (rating: number | null) => {
     if (saved) {
@@ -68,16 +82,17 @@ export default function DetailPage() {
 
   return (
     <div>
-      <div className="relative -mx-4 h-64 overflow-hidden sm:h-80">
+      <div className="relative -mx-4 h-64 overflow-hidden sm:h-80" aria-hidden="true">
         {backdrop ? (
           <img
             src={backdrop}
             alt=""
-            className="size-full object-cover opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent)]"
+            className="size-full object-cover opacity-60 grayscale"
           />
         ) : (
           <div className="size-full bg-muted" />
         )}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
       </div>
 
       <Button variant="ghost" size="sm" className="-ml-2" render={<Link to="/" />}>
@@ -85,7 +100,7 @@ export default function DetailPage() {
         Kembali
       </Button>
 
-      <div className="mt-4 flex flex-col gap-6 sm:flex-row">
+      <div className="mt-4 flex animate-in fade-in slide-in-from-bottom-2 flex-col gap-6 duration-300 ease-out motion-reduce:animate-none sm:flex-row">
         <div className="w-36 shrink-0 sm:w-48">
           {poster ? (
             <img
@@ -135,10 +150,7 @@ export default function DetailPage() {
           </p>
 
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <Button
-              variant={saved ? 'secondary' : 'default'}
-              onClick={() => (saved ? wl.remove(key) : wl.add({ type: data.type, tmdbId: data.tmdbId, title: data.title, posterPath: data.posterPath, year: data.year, score: data.score }))}
-            >
+            <Button variant={saved ? 'secondary' : 'default'} onClick={toggleSave}>
               {saved ? 'Hapus dari watchlist' : 'Simpan ke watchlist'}
             </Button>
             <Stars value={entry?.rating ?? null} onChange={rate} label={`Rating ${data.title}`} />
