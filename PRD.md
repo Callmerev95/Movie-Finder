@@ -273,6 +273,10 @@ aksesibilitas). Ringkasan kunci:
 | `npm run build` | Produksi build | ✅ hijau |
 | `npm run dev` | Dev server | — |
 
+CI GitHub Actions (`.github/workflows/ci.yml`) menjalankan typecheck → test →
+build pada setiap push ke `main` dan setiap pull request. Badge status di
+`README.md`.
+
 - Test murni untuk pure functions: URL builder, normalizer, watchlist ops,
   filter parse. File test berdampingan `src/lib/*.test.ts`.
 - Happy path dismoke-test via browser (search → detail → add → rating).

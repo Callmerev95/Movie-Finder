@@ -3,7 +3,7 @@
 Cari film & serial via TMDb, simpan watchlist, beri rating — semuanya lokal di
 browser. Tanpa akun, tanpa database, tanpa backend.
 
-![Stack](https://img.shields.io/badge/Vite-8-646CFF) ![React](https://img.shields.io/badge/React-19-61DAFB) ![TypeScript](https://img.shields.io/badge/TypeScript-7-3178C6) ![Tailwind](https://img.shields.io/badge/Tailwind-v4-38BDF8) ![Vitest](https://img.shields.io/badge/Vitest-53%2F53-6E9F18)
+![Stack](https://img.shields.io/badge/Vite-8-646CFF) ![React](https://img.shields.io/badge/React-19-61DAFB) ![TypeScript](https://img.shields.io/badge/TypeScript-7-3178C6) ![Tailwind](https://img.shields.io/badge/Tailwind-v4-38BDF8) ![Vitest](https://img.shields.io/badge/Vitest-53%2F53-6E9F18) ![CI](https://github.com/Callmerev95/Movie-Finder/actions/workflows/ci.yml/badge.svg)
 
 - **Dua mode pencarian** — ketik judul (Search) atau pakai filter genre, tahun,
   provider streaming, dan Konten Indonesia (Discover). State pencarian tersimpan
