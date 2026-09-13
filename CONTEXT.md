@@ -57,3 +57,8 @@ Grid landing yang tampil ketika belum ada pencarian — item paling ramai
 minggu ini dari TMDb. Bukan Mode Pencarian: tidak punya URL param dan
 hilang begitu pengguna mencari.
 _Avoid_: Mode Pencarian, rekomendasi
+
+**Provider Streaming**:
+Layanan tempat sebuah Item dapat ditonton di region Indonesia, dalam
+kategori Langganan, Sewa, atau Beli. Ditampilkan di halaman detail saja.
+_Avoid_: Platform, where-to-watch

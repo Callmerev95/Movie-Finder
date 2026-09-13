@@ -163,6 +163,47 @@ export default function DetailPage() {
             </section>
           )}
 
+          {data.providers && (
+            <section className="mt-6">
+              <h2 className="text-sm font-medium">Tempat menonton (Indonesia)</h2>
+              <dl className="mt-3 flex flex-col gap-3">
+                {(
+                  [
+                    ['Langganan', data.providers.flatrate],
+                    ['Sewa', data.providers.rent],
+                    ['Beli', data.providers.buy],
+                  ] as const
+                ).map(
+                  ([label, list]) =>
+                    list.length > 0 && (
+                      <div key={label} className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                        <dt className="w-20 shrink-0 text-xs text-muted-foreground">{label}</dt>
+                        <dd className="flex flex-wrap gap-2">
+                          {list.map((p) => (
+                            <span
+                              key={p.id}
+                              className="flex items-center gap-2 rounded-md border border-border/60 bg-card/80 py-1 pe-2.5 ps-1.5 text-xs text-card-foreground"
+                            >
+                              {p.logoPath ? (
+                                <img
+                                  src={imageUrl(p.logoPath, 'w92') ?? ''}
+                                  alt=""
+                                  loading="lazy"
+                                  decoding="async"
+                                  className="h-5 w-auto rounded-sm"
+                                />
+                              ) : null}
+                              {p.name}
+                            </span>
+                          ))}
+                        </dd>
+                      </div>
+                    ),
+                )}
+              </dl>
+            </section>
+          )}
+
           {data.trailerKey && (
             <section className="mt-6">
               <h2 className="text-sm font-medium">Trailer</h2>

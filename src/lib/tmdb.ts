@@ -1,5 +1,5 @@
 import { get, TmdbError } from './tmdb-fetch'
-import type { DetailData, Genre, Item, Paged, Filters, MediaType } from './types'
+import type { DetailData, Genre, Item, Paged, Filters, MediaType, ProviderSections } from './types'
 
 interface RawMultiResult {
   id: number
@@ -38,6 +38,7 @@ interface RawDetail {
   number_of_seasons?: number
   credits?: { cast?: RawCast[] }
   videos?: { results?: RawVideo[] }
+  'watch/providers'?: RawProviders
 }
 
 interface RawCast {
@@ -52,6 +53,17 @@ interface RawVideo {
   site: string
   type: string
   official?: boolean
+}
+
+interface RawProvider {
+  provider_id: number
+  provider_name: string
+  logo_path: string | null
+}
+
+interface RawProviders {
+  id: number
+  results?: { ID?: { flatrate?: RawProvider[]; rent?: RawProvider[]; buy?: RawProvider[] } }
 }
 
 function year(date?: string): number | null {
@@ -121,6 +133,17 @@ export function genreList(type: MediaType): Promise<Genre[]> {
   return get<RawGenreList>(`/genre/${type}/list`, {}).then((r) => r.genres)
 }
 
+export function normalizeProviders(raw: RawProviders['results']): ProviderSections | null {
+  const id = raw?.ID
+  if (!id) return null
+  const of = (list?: RawProvider[]) => (list ?? []).map((p) => ({ id: p.provider_id, name: p.provider_name, logoPath: p.logo_path ?? null }))
+  const flatrate = of(id.flatrate)
+  const rent = of(id.rent)
+  const buy = of(id.buy)
+  if (flatrate.length === 0 && rent.length === 0 && buy.length === 0) return null
+  return { flatrate, rent, buy }
+}
+
 export function normalizeDetail(raw: RawDetail, type: MediaType): DetailData {
   const trailer =
     raw.videos?.results?.find((v) => v.site === 'YouTube' && v.type === 'Trailer' && v.official) ??
@@ -144,11 +167,12 @@ export function normalizeDetail(raw: RawDetail, type: MediaType): DetailData {
       profilePath: c.profile_path ?? null,
     })),
     trailerKey: trailer?.key ?? null,
+    providers: normalizeProviders(raw['watch/providers']?.results),
   }
 }
 
 export function detail(type: MediaType, id: number): Promise<DetailData> {
-  return get<RawDetail>(`/${type}/${id}`, { append_to_response: 'videos,credits' }).then((r) =>
+  return get<RawDetail>(`/${type}/${id}`, { append_to_response: 'videos,credits,watch/providers' }).then((r) =>
     normalizeDetail(r, type),
   )
 }

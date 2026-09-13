@@ -20,7 +20,7 @@
 |---|-------|---------------------|
 | US-1 | Sebagai pengguna, saya ingin mencari film/serial by judul agar cepat menemukan kandidat tontonan. | Debounce 300ms; hasil pertama < 1.5s; hasil `person` dibuang; tampil poster, judul, tahun, Skor TMDb, badge type (Film/Serial); load-more pagination 20/halaman. Mode Search via `/search/multi`. |
 | US-2 | Sebagai pengguna, saya ingin filter genre & tahun agar mempersempit hasil. | Filter genre multi-select + rentang tahun (Dari/Sampai); Mode Discover via `/discover/movie|tv`, default type Film dengan toggle Serial; genre list per-type, pilihan reset saat ganti type (genre ID beda per type); submit teks saat filter aktif → switch Search mode + clear filter + toast; state filter tersimpan di URL (shareable, back button berfungsi). Lihat ADR 0001. |
-| US-3 | Sebagai pengguna, saya ingin melihat detail item agar memutuskan menonton. | Halaman detail: poster besar, sinopsis, genre, durasi (film) / jumlah season (serial), rating, cast utama, embed trailer YouTube (jika ada). Endpoint dispatch by type: `/movie/{id}` vs `/tv/{id}` dengan `append_to_response=videos,credits`. |
+| US-3 | Sebagai pengguna, saya ingin melihat detail item agar memutuskan menonton. | Halaman detail: poster besar, sinopsis, genre, durasi (film) / jumlah season (serial), rating, cast utama, embed trailer YouTube (jika ada), tempat menonton per region Indonesia (Langganan/Sewa/Beli; sembunyikan bila tidak ada — ADR 0002). Endpoint dispatch by type: `/movie/{id}` vs `/tv/{id}` dengan `append_to_response=videos,credits,watch/providers`. |
 | US-4 | Sebagai pengguna, saya ingin menyimpan item ke watchlist agar tidak lupa. | Tombol add/remove dari hasil & detail; watchlist bertahan setelah refresh; badge jumlah item di navigasi. |
 | US-5 | Sebagai pengguna, saya ingin memberi rating 1–5 agar mencatat opini pribadi. | Rating di halaman detail otomatis add item ke watchlist + set rating (satu langkah); di watchlist bisa edit/clear rating; tersimpan persisten. |
 | US-6 | Sebagai pengguna, saya ingin mengelola watchlist agar rapi. | Hapus item; sort by tanggal ditambah (default) / rating / judul; empty state jelas saat list kosong. |
@@ -42,7 +42,6 @@
 ### Non-Goals
 
 - Tidak ada akun/login (MVP localStorage only).
-- Tidak ada where-to-watch (provider streaming).
 - Tidak ada rekomendasi berbasis selera/mood.
 - Tidak ada review panjang — rating 1–5 saja.
 - Tidak ada sinkronisasi multi-device (v2.0).
@@ -89,7 +88,7 @@ SPA (Browser)
 
 ### Phased Rollout
 
-- **MVP**: US-1 s/d US-6 — search film+serial, filter genre/tahun, detail+trailer, watchlist, rating, sort.
+- **MVP**: US-1 s/d US-6 + trending landing (`/trending/all/week`) — search film+serial, filter genre/tahun, detail+trailer+tempat menonton, watchlist, rating, sort.
 - **v1.1**: Export/import watchlist JSON (backup anti-hilang); dark mode.
 - **v2.0**: Migrasi ke Supabase Auth + Postgres untuk persist lintas device — skema `watchlist(user_id, type, tmdb_id, rating, added_at)` + RLS.
 

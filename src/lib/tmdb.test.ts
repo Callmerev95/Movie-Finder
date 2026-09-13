@@ -103,3 +103,24 @@ describe('trending', () => {
     expect(trendingCalls).toEqual([{ path: '/trending/all/week', params: { include_adult: true } }])
   })
 })
+
+describe('normalizeProviders', () => {
+  it('map ID sections, buang section kosong via null bila semua kosong', async () => {
+    const { normalizeProviders } = await import('./tmdb')
+    const r = normalizeProviders({
+      ID: {
+        flatrate: [{ provider_id: 1, provider_name: 'Netflix', logo_path: '/n.png' }],
+        rent: [{ provider_id: 2, provider_name: 'Apple TV', logo_path: null }],
+        buy: [],
+      },
+    })
+    expect(r).toEqual({
+      flatrate: [{ id: 1, name: 'Netflix', logoPath: '/n.png' }],
+      rent: [{ id: 2, name: 'Apple TV', logoPath: null }],
+      buy: [],
+    })
+    expect(normalizeProviders({ ID: { flatrate: [], rent: [], buy: [] } })).toBeNull()
+    expect(normalizeProviders({})).toBeNull()
+    expect(normalizeProviders(undefined)).toBeNull()
+  })
+})

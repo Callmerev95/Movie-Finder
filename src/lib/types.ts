@@ -37,6 +37,18 @@ export interface CastMember {
   profilePath: string | null
 }
 
+export interface Provider {
+  id: number
+  name: string
+  logoPath: string | null
+}
+
+export interface ProviderSections {
+  flatrate: Provider[]
+  rent: Provider[]
+  buy: Provider[]
+}
+
 export interface DetailData {
   type: MediaType
   tmdbId: number
@@ -51,4 +63,5 @@ export interface DetailData {
   seasons: number | null
   cast: CastMember[]
   trailerKey: string | null
+  providers: ProviderSections | null
 }
