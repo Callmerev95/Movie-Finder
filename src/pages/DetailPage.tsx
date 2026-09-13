@@ -95,7 +95,7 @@ export default function DetailPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
       </div>
 
-      <Button variant="ghost" size="sm" className="-ml-2" render={<Link to="/" />}>
+      <Button variant="ghost" size="sm" className="-ms-2" render={<Link to="/" />}>
         <ArrowLeft className="size-4" aria-hidden="true" />
         Kembali
       </Button>

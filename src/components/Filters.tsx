@@ -14,6 +14,7 @@ interface Props {
 
 export function Filters({ type, filters, onChange }: Props) {
   const [genres, setGenres] = useState<Genre[]>([])
+  const [open, setOpen] = useState(true)
 
   useEffect(() => {
     // Q8a: genre ID beda per type — fetch per type, cache di tmdb-fetch
@@ -40,14 +41,13 @@ export function Filters({ type, filters, onChange }: Props) {
   }
 
   return (
-    <section aria-label="Filter" className="flex flex-wrap items-center gap-2">
+    <section aria-label="Filter" className="flex flex-wrap items-center gap-x-3 gap-y-3">
       <Button
         variant="outline"
         size="sm"
-        aria-expanded={filters.genres.length > 0}
-        onClick={() => {
-          if (filters.genres.length > 0) onChange({ filters: { ...filters, genres: [] } })
-        }}
+        aria-expanded={open}
+        aria-controls="genre-chips"
+        onClick={() => setOpen((o) => !o)}
       >
         <Filter className="size-3.5" aria-hidden="true" />
         Genre
@@ -58,7 +58,8 @@ export function Filters({ type, filters, onChange }: Props) {
         )}
       </Button>
 
-      <div className="flex flex-wrap gap-1.5" role="group" aria-label="Pilih genre">
+      {open && (
+        <div id="genre-chips" className="flex flex-wrap gap-1.5" role="group" aria-label="Pilih genre">
         {genres.map((g) => {
           const on = filters.genres.includes(g.id)
           return (
@@ -79,7 +80,8 @@ export function Filters({ type, filters, onChange }: Props) {
           )
         })}
         {genres.length === 0 && <span className="text-xs text-muted-foreground">Memuat genre…</span>}
-      </div>
+        </div>
+      )}
 
       <div className="flex items-center gap-1.5" role="group" aria-label="Tahun rilis">
         <YearInput

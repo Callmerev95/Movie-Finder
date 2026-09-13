@@ -29,7 +29,7 @@ export function Stars({
           />
         </button>
       ))}
-      <span className="ml-2 self-center text-xs text-muted-foreground tabular-nums" aria-live="polite">
+      <span className="ms-2 self-center text-xs text-muted-foreground tabular-nums" aria-live="polite">
         {value !== null ? `${value}/5` : 'Belum dinilai'}
       </span>
     </div>

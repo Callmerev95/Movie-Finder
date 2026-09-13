@@ -59,7 +59,7 @@ export function ResultCard({ item }: { item: Item }) {
           )}
         </p>
       </Link>
-      <div className="absolute top-2 right-2">
+      <div className="absolute top-2 end-2">
         <Button
           size="icon-xs"
           variant={saved ? 'secondary' : 'default'}
@@ -69,7 +69,7 @@ export function ResultCard({ item }: { item: Item }) {
           {saved ? <Check className="size-3" aria-hidden="true" /> : <Plus className="size-3" aria-hidden="true" />}
         </Button>
       </div>
-      <Badge variant="outline" className="absolute top-2 left-2 border-border/60 bg-background/80 text-muted-foreground backdrop-blur">
+      <Badge variant="outline" className="absolute top-2 start-2 border-border/60 bg-background/80 text-muted-foreground backdrop-blur">
         {item.type === 'movie' ? 'Film' : 'Serial'}
       </Badge>
     </article>
