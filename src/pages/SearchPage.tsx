@@ -154,14 +154,8 @@ export default function SearchPage() {
             {total.toLocaleString('id-ID')} hasil
           </p>
           <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-            {items.map((item, i) => (
-              <div
-                key={`${item.type}-${item.tmdbId}`}
-                className="animate-in fade-in slide-in-from-bottom-2 duration-200 ease-out motion-reduce:animate-none"
-                style={{ animationDelay: `${Math.min(i * 30, 300)}ms` }}
-              >
-                <ResultCard item={item} />
-              </div>
+            {items.map((item) => (
+              <ResultCard key={`${item.type}-${item.tmdbId}`} item={item} />
             ))}
           </div>
           {items.length < total && (

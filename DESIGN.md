@@ -97,9 +97,9 @@ Detail page:
 ## 6. Motion
 
 - Durasi 150–250ms, ease-out. Satu kurva untuk semua.
-- Entrance: satu orchestrated reveal per konten load — grid hasil masuk dengan
-  fade+rise cepat, stagger mini 30ms/item capped total 300ms; detail page reveal
-  sekali saat data ready. Bukan repeat per aksi/section.
+- Entrance: hanya detail reveal sekali saat data ready. Grid hasil tanpa
+  entrance — konten langsung tampil, karena frekuensi tinggi (search, filter,
+  load-more berulang) dan stagger per-item kasar tanpa fill-mode (flash–hilang–muncul).
 - `prefers-reduced-motion: reduce` → entrance dinonaktifkan penuh (konten
   langsung tampil); nol scale/brightness hover; toast muncul tanpa transisi.
 
