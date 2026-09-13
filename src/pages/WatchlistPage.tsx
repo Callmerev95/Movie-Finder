@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bookmark, Check, Download, Trash2, Upload } from 'lucide-react'
+import { Bookmark, Check, Download, Trash2, Upload, BarChart3 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { imageUrl } from '@/lib/tmdb'
@@ -99,6 +99,10 @@ export default function WatchlistPage() {
           ))}
         </div>
         <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" render={<Link to="/stats" />}>
+            <BarChart3 className="size-4" aria-hidden="true" />
+            Statistik
+          </Button>
           <Button variant="outline" size="sm" onClick={handleExport}>
             <Download className="size-4" aria-hidden="true" />
             Ekspor

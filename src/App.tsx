@@ -9,6 +9,7 @@ import SearchPage from './pages/SearchPage'
 import DetailPage from './pages/DetailPage'
 import PersonPage from './pages/PersonPage'
 import WatchlistPage from './pages/WatchlistPage'
+import StatsPage from './pages/StatsPage'
 import { WatchlistProvider, useWatchlist } from '@/lib/useWatchlist'
 import { CommandPalette } from '@/components/CommandPalette'
 
@@ -60,6 +61,7 @@ export default function App() {
           <Route path="/detail/:type/:id" element={<DetailPage />} />
           <Route path="/person/:id" element={<PersonPage />} />
           <Route path="/watchlist" element={<WatchlistPage />} />
+          <Route path="/stats" element={<StatsPage />} />
         </Routes>
       </main>
       <footer className="border-t border-border">

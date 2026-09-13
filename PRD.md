@@ -123,6 +123,7 @@ keputusan arsitektur di `docs/adr/`.
 | US-10 | **Command palette Cmd+K** | Buka via `⌘K`/`Ctrl+K` saja (tanpa tombol nav — search utama tetap di SearchBar); hint `⌘K` tampil di SearchBar; debounce 300ms; ketik ≥ 2 karakter → hasil search mini (7 item, poster + badge type + tahun + Skor TMDb), pilih → langsung ke detail; Enter dengan teks → halaman Search penuh; tanpa teks → aksi navigasi (Beranda, Watchlist); keyboard penuh (↑↓ + Enter + Esc), semantik `listbox`/`option`; tutup reset state. | ✅ |
 | US-11 | **Rekomendasi serupa** | Section "Mungkin kamu suka" di halaman detail: 12 item via `/{type}/{id}/recommendations`, fallback `/{type}/{id}/similar` bila kosong/gagal; fetch non-blocking paralel dengan detail — gagal/kosong → section disembunyikan, detail tetap tampil; grid `ResultCard` reuse. | ✅ |
 | US-12 | **PWA installable + offline** | `vite-plugin-pwa` (`registerType: autoUpdate`); manifest: nama, `display: standalone`, `theme_color`/`background_color` `#0f0f0f`, ikon 192/512 + maskable; app shell ter-precache (HTML/CSS/JS/font/ikon) → halaman tetap tampil tanpa jaringan; poster TMDb cache-first (cap 300, 30 hari), API TMDb network-first (timeout 5s, fallback cache 1 hari); watchlist 100% offline (localStorage). | ✅ |
+| US-13 | **Statistik watchlist** | Route `/stats` (link dari WatchlistPage): agregasi murni data lokal via `watchlistStats` — 4 kartu angka (total, ditonton, belum, rata-rata rating), donut SVG custom Film vs Serial + status tontonan, bar distribusi rating 1–5, bar 6 bulan terakhir, top 5 rating tertinggi; chart SVG tanpa dependency (`role="img"` + `aria-label`, angka selalu teks); empty state CTA bila watchlist kosong. | ✅ |
 
 ---
 
@@ -269,7 +270,7 @@ aksesibilitas). Ringkasan kunci:
 | Perintah | Fungsi | Status |
 |---|---|---|
 | `npm run typecheck` | `tsc --noEmit`, wajib hijau | ✅ 0 error |
-| `npm test` | Vitest, pure functions di `src/lib/` | ✅ 53/53 |
+| `npm test` | Vitest, pure functions di `src/lib/` | ✅ 57/57 |
 | `npm run build` | Produksi build | ✅ hijau |
 | `npm run dev` | Dev server | — |
 
