@@ -181,6 +181,18 @@ export function trending(adult = false): Promise<Paged<Item>> {
   return get<RawPaged>('/trending/all/week', { include_adult: adult }).then((r) => pagedOf(r))
 }
 
+// rekomendasi: utamakan /recommendations; kosong/gagal → fallback /similar; cap 12
+export async function recommendations(type: MediaType, id: number): Promise<Item[]> {
+  const raw = await get<RawPaged>(`/${type}/${id}/recommendations`, {})
+    .then((r) => r.results)
+    .catch(() => [])
+  const results = raw.length > 0 ? raw : await get<RawPaged>(`/${type}/${id}/similar`, {}).then((r) => r.results).catch(() => [])
+  return results
+    .map((r) => normalizeItem(r, type))
+    .filter((i): i is Item => i !== null)
+    .slice(0, 12)
+}
+
 export function genreList(type: MediaType): Promise<Genre[]> {
   return get<RawGenreList>(`/genre/${type}/list`, {}).then((r) => r.genres)
 }

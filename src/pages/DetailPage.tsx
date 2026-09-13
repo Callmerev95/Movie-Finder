@@ -4,9 +4,10 @@ import { ArrowLeft, Calendar, Check, Clock, ExternalLink, Star } from 'lucide-re
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Stars } from '@/components/Stars'
-import { detail, imageUrl, TmdbError } from '@/lib/tmdb'
+import { ResultCard } from '@/components/ResultCard'
+import { detail, imageUrl, recommendations, TmdbError } from '@/lib/tmdb'
 import { detailInfoRows } from '@/lib/detail-info'
-import type { DetailData } from '@/lib/types'
+import type { DetailData, Item } from '@/lib/types'
 import { useWatchlist } from '@/lib/useWatchlist'
 import { toastSuccess, toastWithUndo } from '@/lib/toast'
 
@@ -15,6 +16,7 @@ export default function DetailPage() {
   const [data, setData] = useState<DetailData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [related, setRelated] = useState<Item[]>([])
   const wl = useWatchlist()
 
   useEffect(() => {
@@ -23,6 +25,9 @@ export default function DetailPage() {
     if (!Number.isInteger(n)) return
     setLoading(true)
     setError(null)
+    setRelated([])
+    // rekomendasi non-blocking: gagal/kosong → section disembunyikan, detail tetap tampil
+    void recommendations(type, n).then(setRelated).catch(() => setRelated([]))
     detail(type, n)
       .then(setData)
       .catch((e) => setError(e instanceof TmdbError ? e.message : 'Gagal memuat detail.'))
@@ -307,6 +312,17 @@ export default function DetailPage() {
                   </li>
                 ))}
               </ul>
+            </section>
+          )}
+
+          {related.length > 0 && (
+            <section className="mt-8">
+              <h2 className="text-sm font-medium">Mungkin kamu suka</h2>
+              <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+                {related.map((item) => (
+                  <ResultCard key={`${item.type}-${item.tmdbId}`} item={item} />
+                ))}
+              </div>
             </section>
           )}
         </div>

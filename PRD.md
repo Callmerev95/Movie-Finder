@@ -121,6 +121,7 @@ keputusan arsitektur di `docs/adr/`.
 | US-8 | **Halaman Orang** | Klik pemeran di detail → halaman profil: foto, biografi, departemen, tanggal lahir/kematian, tempat lahir; filmografi "Paling dikenal dari" (maks 24 item, sort Skor TMDb desc, dedup id+type). Endpoint `/person/{id}` dengan `append_to_response=combined_credits`. | ✅ |
 | US-9 | **Trending landing** | Grid "Trending Minggu Ini" tampil saat belum ada pencarian; 20 item fixed tanpa load-more; hilang saat search, kembali saat clear; bukan Mode Pencarian (nol URL param). Endpoint `/trending/all/week`. | ✅ |
 | US-10 | **Command palette Cmd+K** | Buka via `⌘K`/`Ctrl+K` saja (tanpa tombol nav — search utama tetap di SearchBar); hint `⌘K` tampil di SearchBar; debounce 300ms; ketik ≥ 2 karakter → hasil search mini (7 item, poster + badge type + tahun + Skor TMDb), pilih → langsung ke detail; Enter dengan teks → halaman Search penuh; tanpa teks → aksi navigasi (Beranda, Watchlist); keyboard penuh (↑↓ + Enter + Esc), semantik `listbox`/`option`; tutup reset state. | ✅ |
+| US-11 | **Rekomendasi serupa** | Section "Mungkin kamu suka" di halaman detail: 12 item via `/{type}/{id}/recommendations`, fallback `/{type}/{id}/similar` bila kosong/gagal; fetch non-blocking paralel dengan detail — gagal/kosong → section disembunyikan, detail tetap tampil; grid `ResultCard` reuse. | ✅ |
 
 ---
 
@@ -206,6 +207,7 @@ Nol logika bisnis di komponen.
 | Discover | `/discover/movie` / `/discover/tv` | param dilihat di ADR 0001 |
 | Genre list | `/genre/movie/list` / `/genre/tv/list` | ID genre beda per type |
 | Detail | `/movie/{id}` / `/tv/{id}` | `append_to_response=videos,credits,watch/providers`, `include_video_language=id,en,null` |
+| Rekomendasi | `/movie/{id}/recommendations` / `/tv/{id}/recommendations` | fallback `/similar` |
 | Provider list | `/watch/providers/{movie\|tv}?watch_region=ID` | diurut nama id-ID |
 | Trending | `/trending/all/week` | — |
 | Person | `/person/{id}` | `append_to_response=combined_credits` |
@@ -262,7 +264,7 @@ aksesibilitas). Ringkasan kunci:
 | Perintah | Fungsi | Status |
 |---|---|---|
 | `npm run typecheck` | `tsc --noEmit`, wajib hijau | ✅ 0 error |
-| `npm test` | Vitest, pure functions di `src/lib/` | ✅ 50/50 |
+| `npm test` | Vitest, pure functions di `src/lib/` | ✅ 52/52 |
 | `npm run build` | Produksi build | ✅ hijau |
 | `npm run dev` | Dev server | — |
 

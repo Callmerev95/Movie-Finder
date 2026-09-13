@@ -3,7 +3,7 @@
 Cari film & serial via TMDb, simpan watchlist, beri rating — semuanya lokal di
 browser. Tanpa akun, tanpa database, tanpa backend.
 
-![Stack](https://img.shields.io/badge/Vite-8-646CFF) ![React](https://img.shields.io/badge/React-19-61DAFB) ![TypeScript](https://img.shields.io/badge/TypeScript-7-3178C6) ![Tailwind](https://img.shields.io/badge/Tailwind-v4-38BDF8) ![Vitest](https://img.shields.io/badge/Vitest-50%2F50-6E9F18)
+![Stack](https://img.shields.io/badge/Vite-8-646CFF) ![React](https://img.shields.io/badge/React-19-61DAFB) ![TypeScript](https://img.shields.io/badge/TypeScript-7-3178C6) ![Tailwind](https://img.shields.io/badge/Tailwind-v4-38BDF8) ![Vitest](https://img.shields.io/badge/Vitest-52%2F52-6E9F18)
 
 - **Dua mode pencarian** — ketik judul (Search) atau pakai filter genre, tahun,
   provider streaming, dan Konten Indonesia (Discover). State pencarian tersimpan
@@ -11,7 +11,7 @@ browser. Tanpa akun, tanpa database, tanpa backend.
 - **Command palette `⌘K`** — power-user shortcut: cari judul & lompat ke halaman
   dari mana saja; full-keyboard, hasil mini dengan poster langsung ke detail.
 - **Detail lengkap** — poster, backdrop, sinopsis, trailer YouTube, pemeran,
-  tempat menonton di Indonesia, link IMDb.
+  rekomendasi serupa, tempat menonton di Indonesia, link IMDb.
 - **Watchlist pribadi** — tambah/hapus (dengan undo), rating 1–5, tandai
   ditonton, sort, ekspor/impor JSON sebagai cadangan. Semuanya di
   `localStorage`.
@@ -39,7 +39,7 @@ error "API key TMDb belum diatur".
 |---|---|
 | `npm run dev` | Dev server |
 | `npm run typecheck` | `tsc --noEmit` — wajib hijau |
-| `npm test` | Vitest — 50 test pure functions di `src/lib/` |
+| `npm test` | Vitest — 52 test pure functions di `src/lib/` |
 | `npm run build` | Build produksi |
 | `npm run preview` | Preview hasil build |
 

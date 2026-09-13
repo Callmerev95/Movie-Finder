@@ -1,10 +1,16 @@
 import { describe, expect, it, vi } from 'vitest'
 
 const trendingCalls: { path: string; params: Record<string, unknown> }[] = []
+const resultBox = { current: [] as unknown[] }
 vi.mock('./tmdb-fetch', () => ({
   get: (path: string, params: Record<string, unknown>) => {
     trendingCalls.push({ path, params })
-    return Promise.resolve({ page: 1, total_pages: 1, total_results: 1, results: [] })
+    return Promise.resolve({
+      page: 1,
+      total_pages: 1,
+      total_results: resultBox.current.length,
+      results: resultBox.current,
+    })
   },
   TmdbError: class extends Error {},
 }))
@@ -155,6 +161,34 @@ describe('trending', () => {
     const { trending } = await import('./tmdb')
     await trending(true)
     expect(trendingCalls).toEqual([{ path: '/trending/all/week', params: { include_adult: true } }])
+  })
+})
+
+describe('recommendations', () => {
+  const mk = (n: number) =>
+    Array.from({ length: n }, (_, i) => ({
+      id: i,
+      media_type: 'movie',
+      title: `F${i}`,
+      vote_average: 5,
+    }))
+
+  it('recommendations ada → pakai itu, cap 12, tanpa panggil /similar', async () => {
+    const { recommendations } = await import('./tmdb')
+    resultBox.current = mk(20)
+    const items = await recommendations('movie', 27205)
+    expect(trendingCalls.at(-1)?.path).toBe('/movie/27205/recommendations')
+    expect(trendingCalls.filter((c) => c.path === '/movie/27205/similar')).toHaveLength(0)
+    expect(items).toHaveLength(12)
+    expect(items[0].title).toBe('F0')
+  })
+
+  it('recommendations kosong → fallback /similar', async () => {
+    const { recommendations } = await import('./tmdb')
+    resultBox.current = []
+    const items = await recommendations('movie', 27205)
+    expect(trendingCalls.some((c) => c.path === '/movie/27205/similar')).toBe(true)
+    expect(items).toEqual([])
   })
 })
 
