@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, Calendar, Clock, Star } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, ExternalLink, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Stars } from '@/components/Stars'
 import { detail, imageUrl, TmdbError } from '@/lib/tmdb'
+import { detailInfoRows } from '@/lib/detail-info'
 import type { DetailData } from '@/lib/types'
 import { useWatchlist } from '@/lib/useWatchlist'
 import { toastSuccess, toastWithUndo } from '@/lib/toast'
@@ -125,6 +126,9 @@ export default function DetailPage() {
             ))}
           </div>
           <h1 className="mt-2 text-2xl font-medium tracking-tight sm:text-3xl">{data.title}</h1>
+          {data.tagline && (
+            <p className="mt-1.5 text-sm italic text-muted-foreground">{data.tagline}</p>
+          )}
           <p className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
             {data.year && (
               <span className="flex items-center gap-1 tabular-nums">
@@ -162,6 +166,35 @@ export default function DetailPage() {
               <p className="max-w-prose text-sm leading-relaxed text-card-foreground/90">{data.overview}</p>
             </section>
           )}
+
+          {(() => {
+            const rows = detailInfoRows(data)
+            return rows.length > 0 ? (
+              <section className="mt-6">
+                <h2 className="text-sm font-medium">Informasi</h2>
+                <dl className="mt-3 flex flex-col gap-2">
+                  {rows.map(([label, value]) => (
+                    <div key={label} className="flex flex-wrap gap-x-3">
+                      <dt className="w-32 shrink-0 text-xs text-muted-foreground">{label}</dt>
+                      <dd className="min-w-0 flex-1 text-xs text-card-foreground/90">{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+                {data.imdbId && (
+                  <a
+                    href={`https://www.imdb.com/title/${data.imdbId}/`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-flex items-center gap-1 text-xs text-primary underline-offset-4 hover:underline"
+                  >
+                    Lihat di IMDb
+                    <span className="sr-only">buka di tab baru</span>
+                    <ExternalLink className="size-3" aria-hidden="true" />
+                  </a>
+                )}
+              </section>
+            ) : null
+          })()}
 
           {data.providers && (
             <section className="mt-6">

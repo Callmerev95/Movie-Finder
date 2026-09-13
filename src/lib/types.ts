@@ -53,14 +53,29 @@ export interface DetailData {
   type: MediaType
   tmdbId: number
   title: string
+  tagline: string
+  status: string | null
   posterPath: string | null
   backdropPath: string | null
   year: number | null
   score: number | null
+  voteCount: number | null
   overview: string
   genres: Genre[]
   runtime: number | null
   seasons: number | null
+  episodes: number | null
+  lastAirDate: string | null
+  budget: number | null
+  revenue: number | null
+  originalTitle: string | null
+  originalLanguage: string | null
+  imdbId: string | null
+  productionCompanies: string[]
+  countries: string[]
+  directors: string[]
+  creators: string[]
+  networks: string[]
   cast: CastMember[]
   trailerKey: string | null
   providers: ProviderSections | null

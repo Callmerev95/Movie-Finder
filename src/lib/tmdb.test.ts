@@ -124,3 +124,80 @@ describe('normalizeProviders', () => {
     expect(normalizeProviders(undefined)).toBeNull()
   })
 })
+
+describe('normalizeDetail enrichment', () => {
+  const base = { id: 27205, title: 'Inception', release_date: '2010-07-15', vote_average: 8.4 }
+
+  it('trailer chain: official > trailer > teaser official > teaser', async () => {
+    const { normalizeDetail } = await import('./tmdb')
+    const videos = (list: [string, boolean?][]) => ({
+      results: list.map(([type, official], i) => ({ key: `k${i}`, site: 'YouTube', type, official })),
+    })
+    expect(
+      normalizeDetail(
+        { ...base, videos: videos([['Trailer', false], ['Teaser', true]]) },
+        'movie',
+      ).trailerKey,
+    ).toBe('k0')
+    expect(
+      normalizeDetail({ ...base, videos: videos([['Teaser', false], ['Teaser', true]]) }, 'movie').trailerKey,
+    ).toBe('k1')
+    expect(normalizeDetail({ ...base, videos: videos([['Clip', true]]) }, 'movie').trailerKey).toBeNull()
+    expect(
+      normalizeDetail({ ...base, videos: { results: [{ key: 'x', site: 'Vimeo', type: 'Trailer' }] } }, 'movie')
+        .trailerKey,
+    ).toBeNull()
+  })
+
+  it('field movie: sutradara, uang 0 jadi null, imdb', async () => {
+    const { normalizeDetail } = await import('./tmdb')
+    const d = normalizeDetail(
+      {
+        ...base,
+        tagline: 'Your mind is the scene of the crime.',
+        status: 'Released',
+        vote_count: 40158,
+        budget: 160000000,
+        revenue: 0,
+        imdb_id: 'tt1375666',
+        original_title: 'Inception',
+        original_language: 'en',
+        production_companies: [{ id: 1, name: 'Warner Bros. Pictures' }],
+        production_countries: [{ iso_3166_1: 'US', name: 'United States of America' }],
+        credits: { crew: [{ id: 1, name: 'Christopher Nolan', job: 'Director' }, { id: 2, name: 'X', job: 'Editor' }] },
+      },
+      'movie',
+    )
+    expect(d.tagline).toBe('Your mind is the scene of the crime.')
+    expect(d.status).toBe('Released')
+    expect(d.voteCount).toBe(40158)
+    expect(d.budget).toBe(160000000)
+    expect(d.revenue).toBeNull()
+    expect(d.imdbId).toBe('tt1375666')
+    expect(d.directors).toEqual(['Christopher Nolan'])
+    expect(d.productionCompanies).toEqual(['Warner Bros. Pictures'])
+  })
+
+  it('field tv: creator, network, episode', async () => {
+    const { normalizeDetail } = await import('./tmdb')
+    const d = normalizeDetail(
+      {
+        id: 1399,
+        name: 'Breaking Bad',
+        first_air_date: '2008-01-20',
+        vote_average: 8.9,
+        number_of_seasons: 5,
+        number_of_episodes: 62,
+        last_air_date: '2013-09-29',
+        created_by: [{ id: 1, name: 'Vince Gilligan' }],
+        networks: [{ id: 2, name: 'HBO' }],
+      },
+      'tv',
+    )
+    expect(d.episodes).toBe(62)
+    expect(d.lastAirDate).toBe('2013-09-29')
+    expect(d.creators).toEqual(['Vince Gilligan'])
+    expect(d.networks).toEqual(['HBO'])
+    expect(d.originalTitle).toBeNull()
+  })
+})

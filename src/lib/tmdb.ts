@@ -27,16 +27,32 @@ interface RawDetail {
   id: number
   title?: string
   name?: string
+  tagline?: string
+  status?: string
+  overview?: string
   poster_path?: string | null
   backdrop_path?: string | null
   release_date?: string
   first_air_date?: string
   vote_average?: number
-  overview?: string
+  vote_count?: number
   genres?: { id: number; name: string }[]
   runtime?: number
   number_of_seasons?: number
-  credits?: { cast?: RawCast[] }
+  number_of_episodes?: number
+  last_air_date?: string
+  budget?: number
+  revenue?: number
+  original_title?: string
+  original_name?: string
+  original_language?: string
+  imdb_id?: string
+  homepage?: string
+  production_companies?: { id: number; name: string }[]
+  production_countries?: { iso_3166_1: string; name: string }[]
+  created_by?: { id: number; name: string }[]
+  networks?: { id: number; name: string }[]
+  credits?: { cast?: RawCast[]; crew?: RawCrew[] }
   videos?: { results?: RawVideo[] }
   'watch/providers'?: RawProviders
 }
@@ -46,6 +62,12 @@ interface RawCast {
   name: string
   character?: string
   profile_path?: string | null
+}
+
+interface RawCrew {
+  id: number
+  name: string
+  job?: string
 }
 
 interface RawVideo {
@@ -145,21 +167,41 @@ export function normalizeProviders(raw: RawProviders['results']): ProviderSectio
 }
 
 export function normalizeDetail(raw: RawDetail, type: MediaType): DetailData {
+  const yt = raw.videos?.results?.filter((v) => v.site === 'YouTube') ?? []
   const trailer =
-    raw.videos?.results?.find((v) => v.site === 'YouTube' && v.type === 'Trailer' && v.official) ??
-    raw.videos?.results?.find((v) => v.site === 'YouTube' && v.type === 'Trailer')
+    yt.find((v) => v.type === 'Trailer' && v.official) ??
+    yt.find((v) => v.type === 'Trailer') ??
+    yt.find((v) => v.type === 'Teaser' && v.official) ??
+    yt.find((v) => v.type === 'Teaser')
+  const money = (n?: number) => (typeof n === 'number' && n > 0 ? n : null)
+  const names = (list?: { name: string }[]) => (list ?? []).map((c) => c.name)
   return {
     type,
     tmdbId: raw.id,
     title: raw.title ?? raw.name ?? 'Tanpa judul',
+    tagline: raw.tagline ?? '',
+    status: raw.status ?? null,
     posterPath: raw.poster_path ?? null,
     backdropPath: raw.backdrop_path ?? null,
     year: year(raw.release_date ?? raw.first_air_date),
     score: typeof raw.vote_average === 'number' && raw.vote_average > 0 ? raw.vote_average : null,
+    voteCount: typeof raw.vote_count === 'number' && raw.vote_count > 0 ? raw.vote_count : null,
     overview: raw.overview ?? '',
     genres: raw.genres ?? [],
     runtime: typeof raw.runtime === 'number' ? raw.runtime : null,
     seasons: typeof raw.number_of_seasons === 'number' ? raw.number_of_seasons : null,
+    episodes: typeof raw.number_of_episodes === 'number' ? raw.number_of_episodes : null,
+    lastAirDate: raw.last_air_date ?? null,
+    budget: money(raw.budget),
+    revenue: money(raw.revenue),
+    originalTitle: raw.original_title ?? raw.original_name ?? null,
+    originalLanguage: raw.original_language ?? null,
+    imdbId: raw.imdb_id ?? null,
+    productionCompanies: names(raw.production_companies),
+    countries: names(raw.production_countries),
+    directors: (raw.credits?.crew ?? []).filter((c) => c.job === 'Director').map((c) => c.name),
+    creators: names(raw.created_by),
+    networks: names(raw.networks),
     cast: (raw.credits?.cast ?? []).slice(0, 10).map((c) => ({
       id: c.id,
       name: c.name,
@@ -172,9 +214,10 @@ export function normalizeDetail(raw: RawDetail, type: MediaType): DetailData {
 }
 
 export function detail(type: MediaType, id: number): Promise<DetailData> {
-  return get<RawDetail>(`/${type}/${id}`, { append_to_response: 'videos,credits,watch/providers' }).then((r) =>
-    normalizeDetail(r, type),
-  )
+  return get<RawDetail>(`/${type}/${id}`, {
+    append_to_response: 'videos,credits,watch/providers',
+    include_video_language: 'id,en,null',
+  }).then((r) => normalizeDetail(r, type))
 }
 
 export { TmdbError }
