@@ -3,6 +3,7 @@ import { useLocation, useSearchParams } from 'react-router-dom'
 import { SearchBar } from '@/components/SearchBar'
 import { Filters } from '@/components/Filters'
 import { ResultCard } from '@/components/ResultCard'
+import { TrendingSection } from '@/components/TrendingSection'
 import { Button } from '@/components/ui/button'
 import { Clapperboard, RotateCcw } from 'lucide-react'
 import { discover, searchByTitle, TmdbError } from '@/lib/tmdb'
@@ -131,12 +132,15 @@ export default function SearchPage() {
       )}
 
       {!loading && !error && mode === 'search' && !query && (
-        <div className="mt-16 flex flex-col items-center gap-3 text-center">
-          <Clapperboard className="size-10 text-muted-foreground/50" aria-hidden="true" />
-          <p className="text-sm text-muted-foreground">
-            Cari judul film atau serial, atau pakai filter genre di atas untuk menjelajah.
-          </p>
-        </div>
+        <>
+          <div className="mt-16 flex flex-col items-center gap-3 text-center">
+            <Clapperboard className="size-10 text-muted-foreground/50" aria-hidden="true" />
+            <p className="text-sm text-muted-foreground">
+              Cari judul film atau serial, atau pakai filter genre di atas untuk menjelajah.
+            </p>
+          </div>
+          <TrendingSection adult={filters.adult} />
+        </>
       )}
 
       {!loading && !error && ((mode === 'search' && query) || mode === 'discover') && items.length === 0 && (

@@ -113,6 +113,10 @@ export function discover(filters: Filters, type: MediaType, page = 1): Promise<P
   return get<RawPaged>(`/discover/${type}`, buildDiscoverParams(filters, type, page)).then((r) => pagedOf(r, type))
 }
 
+export function trending(adult = false): Promise<Paged<Item>> {
+  return get<RawPaged>('/trending/all/week', { include_adult: adult }).then((r) => pagedOf(r))
+}
+
 export function genreList(type: MediaType): Promise<Genre[]> {
   return get<RawGenreList>(`/genre/${type}/list`, {}).then((r) => r.genres)
 }

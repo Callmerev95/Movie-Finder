@@ -1,4 +1,14 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+const trendingCalls: { path: string; params: Record<string, unknown> }[] = []
+vi.mock('./tmdb-fetch', () => ({
+  get: (path: string, params: Record<string, unknown>) => {
+    trendingCalls.push({ path, params })
+    return Promise.resolve({ page: 1, total_pages: 1, total_results: 1, results: [] })
+  },
+  TmdbError: class extends Error {},
+}))
+
 import { buildDiscoverParams, buildSearchParams, normalizeItem } from './tmdb'
 
 const raw = {
@@ -83,5 +93,13 @@ describe('buildDiscoverParams', () => {
       page: 1,
       include_adult: false,
     })
+  })
+})
+
+describe('trending', () => {
+  it('endpoint /trending/all/week dengan include_adult', async () => {
+    const { trending } = await import('./tmdb')
+    await trending(true)
+    expect(trendingCalls).toEqual([{ path: '/trending/all/week', params: { include_adult: true } }])
   })
 })

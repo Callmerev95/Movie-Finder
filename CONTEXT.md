@@ -51,3 +51,9 @@ Kategori konten item/fetch: Film atau Serial. Menentukan endpoint genre & discov
 
 **Tahun**:
 Rentang From-To berapa konten dirilis. Input bebas, kosong berarti tanpa batas.
+
+**Trending**:
+Grid landing yang tampil ketika belum ada pencarian — item paling ramai
+minggu ini dari TMDb. Bukan Mode Pencarian: tidak punya URL param dan
+hilang begitu pengguna mencari.
+_Avoid_: Mode Pencarian, rekomendasi
