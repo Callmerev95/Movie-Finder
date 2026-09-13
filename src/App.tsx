@@ -1,10 +1,11 @@
 import { Link, Route, Routes, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
-import { Clapperboard, Bookmark } from 'lucide-react'
+import { Clapperboard, Bookmark, Languages } from 'lucide-react'
 import tmdbLogo from './assets/tmdb-logo.svg'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Toaster } from '@/components/ui/toast'
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
 import SearchPage from './pages/SearchPage'
 import DetailPage from './pages/DetailPage'
 import PersonPage from './pages/PersonPage'
@@ -61,22 +62,21 @@ function Nav() {
 function LangToggle() {
   const { lang, setLang, t } = useLanguage()
   return (
-    <div className="flex items-center gap-1 text-xs" role="group" aria-label={t('footer.language')}>
-      {(['id', 'en'] as const).map((l) => (
-        <button
-          key={l}
-          type="button"
-          onClick={() => setLang(l)}
-          aria-pressed={lang === l}
-          className={
-            'cursor-pointer rounded px-1.5 py-0.5 uppercase outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50 ' +
-            (lang === l ? 'text-foreground' : 'text-muted-foreground hover:text-foreground')
-          }
-        >
-          {l}
-        </button>
-      ))}
-    </div>
+    <Select
+      value={lang}
+      onValueChange={(v) => {
+        if (v === 'id' || v === 'en') setLang(v)
+      }}
+    >
+      <SelectTrigger size="sm" aria-label={t('footer.language')} className="text-xs text-muted-foreground">
+        <Languages className="size-3.5" aria-hidden="true" />
+        <span>{lang === 'id' ? 'Indonesia' : 'English'}</span>
+      </SelectTrigger>
+      <SelectContent align="end">
+        <SelectItem value="id">Indonesia</SelectItem>
+        <SelectItem value="en">English</SelectItem>
+      </SelectContent>
+    </Select>
   )
 }
 
