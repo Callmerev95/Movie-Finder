@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useLocation, useSearchParams } from 'react-router-dom'
 import { SearchBar } from '@/components/SearchBar'
 import { Filters } from '@/components/Filters'
 import { ResultCard } from '@/components/ResultCard'
@@ -11,8 +11,12 @@ import { toastInfo } from '@/lib/toast'
 import type { Item, MediaType } from '@/lib/types'
 
 export default function SearchPage() {
-  const [params, setParams] = useSearchParams()
-  const state = parseUrlState(params)
+  const [, setParams] = useSearchParams()
+  const { search } = useLocation()
+  // state di-memo key string URL: parseUrlState bikin objek baru tiap panggil,
+  // tanpa memo filters selalu referensi baru → fetchFirst recreate → useEffect
+  // fire ulang tiap render (infinite fetch loop, halaman stuck)
+  const state = useMemo(() => parseUrlState(new URLSearchParams(search)), [search])
 
   const [items, setItems] = useState<Item[]>([])
   const [total, setTotal] = useState(0)

@@ -16,7 +16,7 @@ const SORTS: { key: SortKey; label: string }[] = [
 ]
 
 export default function WatchlistPage() {
-  const { entries, rate, remove, add } = useWatchlist()
+  const { entries, rate, remove, restore } = useWatchlist()
   const [sort, setSort] = useState<SortKey>('added')
   const sorted = useMemo(() => sortWatchlist(entries, sort), [entries, sort])
 
@@ -103,7 +103,7 @@ export default function WatchlistPage() {
               onClick={() => {
                 remove({ type: e.type, tmdbId: e.tmdbId })
                 toastWithUndo('Dihapus dari watchlist', e.title, () => {
-                  add(e)
+                  restore(e)
                 })
               }}
             >

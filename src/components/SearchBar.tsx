@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Search as SearchIcon, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
 export function SearchBar({ initial, onSubmit }: { initial: string; onSubmit: (q: string) => void }) {
   const [text, setText] = useState(initial)
-  const navigate = useNavigate()
   const prevInitial = useRef(initial)
 
   useEffect(() => {
@@ -22,10 +20,7 @@ export function SearchBar({ initial, onSubmit }: { initial: string; onSubmit: (q
       className="flex gap-2"
       onSubmit={(e) => {
         e.preventDefault()
-        if (text.trim()) {
-          onSubmit(text.trim())
-          navigate('/')
-        }
+        if (text.trim()) onSubmit(text.trim())
       }}
     >
       <div className="relative flex-1">
@@ -48,7 +43,6 @@ export function SearchBar({ initial, onSubmit }: { initial: string; onSubmit: (q
           onClick={() => {
             setText('')
             onSubmit('')
-            navigate('/')
           }}
         >
           <X className="size-4" aria-hidden="true" />

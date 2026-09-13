@@ -4,6 +4,7 @@ import {
   addWithRating,
   parseWatchlist,
   removeEntry,
+  restoreEntry,
   sameItem,
   serializeWatchlist,
   setRating,
@@ -38,6 +39,13 @@ describe('watchlist ops', () => {
   it('rating di luar 1-5 jadi null', () => {
     const l = addEntry([], movie)
     expect(setRating(l, movie, 9)[0].rating).toBeNull()
+  })
+
+  it('restoreEntry: kembalikan snapshot persis (undo remove)', () => {
+    const rated = { ...movie, addedAt: '2026-01-01T00:00:00.000Z', rating: 4 }
+    const l = restoreEntry(removeEntry([rated], movie), rated)
+    expect(l[0]).toEqual(rated)
+    expect(restoreEntry([rated], rated)).toEqual([rated])
   })
 
   it('remove by type+tmdbId', () => {

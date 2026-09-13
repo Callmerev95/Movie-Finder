@@ -8,7 +8,7 @@ import { useWatchlist } from '@/lib/useWatchlist'
 import { toastSuccess, toastWithUndo } from '@/lib/toast'
 
 export function ResultCard({ item }: { item: Item }) {
-  const { has, add, remove, entries } = useWatchlist()
+  const { has, add, remove, restore, entries } = useWatchlist()
   const saved = has(item)
   const poster = imageUrl(item.posterPath, 'w342')
 
@@ -17,7 +17,7 @@ export function ResultCard({ item }: { item: Item }) {
       const entry = entries.find((e) => e.type === item.type && e.tmdbId === item.tmdbId)
       remove(item)
       toastWithUndo('Dihapus dari watchlist', item.title, () => {
-        if (entry) add({ ...item, ...entry })
+        if (entry) restore(entry)
       })
     } else {
       add(item)

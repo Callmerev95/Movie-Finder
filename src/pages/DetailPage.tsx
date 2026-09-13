@@ -60,7 +60,7 @@ export default function DetailPage() {
     if (saved) {
       wl.remove(key)
       toastWithUndo('Dihapus dari watchlist', data.title, () => {
-        if (entry) wl.add({ ...asItem, posterPath: entry.posterPath })
+        if (entry) wl.restore(entry)
       })
     } else {
       wl.add(asItem)

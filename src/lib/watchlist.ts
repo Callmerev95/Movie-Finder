@@ -36,6 +36,12 @@ export function addEntry(list: WatchlistEntry[], item: Item): WatchlistEntry[] {
   return [{ ...item, rating: null, addedAt: new Date().toISOString() }, ...list]
 }
 
+// undo remove: kembalikan snapshot persis (rating + addedAt asli), bukan add() baru
+export function restoreEntry(list: WatchlistEntry[], entry: WatchlistEntry): WatchlistEntry[] {
+  if (list.some((e) => sameItem(e, entry))) return list
+  return [entry, ...list]
+}
+
 export function removeEntry(list: WatchlistEntry[], key: Pick<Item, 'type' | 'tmdbId'>): WatchlistEntry[] {
   return list.filter((e) => !sameItem(e, key))
 }

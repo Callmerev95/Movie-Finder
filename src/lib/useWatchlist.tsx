@@ -5,6 +5,7 @@ import {
   addWithRating,
   parseWatchlist,
   removeEntry,
+  restoreEntry,
   serializeWatchlist,
   setRating,
   WATCHLIST_STORAGE_KEY,
@@ -17,6 +18,7 @@ interface WatchlistApi {
   add: (item: Item) => void
   addRated: (item: Item, rating: number | null) => void
   remove: (key: Pick<Item, 'type' | 'tmdbId'>) => void
+  restore: (entry: WatchlistEntry) => void
   rate: (key: Pick<Item, 'type' | 'tmdbId'>, rating: number | null) => void
 }
 
@@ -36,6 +38,7 @@ export function WatchlistProvider({ children }: { children: ReactNode }) {
       add: (item) => setEntries((l) => addEntry(l, item)),
       addRated: (item, rating) => setEntries((l) => addWithRating(l, item, rating)),
       remove: (key) => setEntries((l) => removeEntry(l, key)),
+      restore: (entry) => setEntries((l) => restoreEntry(l, entry)),
       rate: (key, rating) => setEntries((l) => setRating(l, key, rating)),
     }),
     [entries],
