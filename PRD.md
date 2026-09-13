@@ -120,6 +120,7 @@ keputusan arsitektur di `docs/adr/`.
 | US-7 | **Tandai ditonton** | Chip "Tandai ditonton" per item di WatchlistPage + di DetailPage saat item tersimpan; default belum ditonton; persisten di `localStorage`. | ✅ |
 | US-8 | **Halaman Orang** | Klik pemeran di detail → halaman profil: foto, biografi, departemen, tanggal lahir/kematian, tempat lahir; filmografi "Paling dikenal dari" (maks 24 item, sort Skor TMDb desc, dedup id+type). Endpoint `/person/{id}` dengan `append_to_response=combined_credits`. | ✅ |
 | US-9 | **Trending landing** | Grid "Trending Minggu Ini" tampil saat belum ada pencarian; 20 item fixed tanpa load-more; hilang saat search, kembali saat clear; bukan Mode Pencarian (nol URL param). Endpoint `/trending/all/week`. | ✅ |
+| US-10 | **Command palette Cmd+K** | Buka via `⌘K`/`Ctrl+K` atau tombol "Cari" di nav; debounce 300ms; ketik ≥ 2 karakter → hasil search mini (7 item, poster + badge type + tahun + Skor TMDb), pilih → langsung ke detail; Enter dengan teks → halaman Search penuh; tanpa teks → aksi navigasi (Beranda, Watchlist); keyboard penuh (↑↓ + Enter + Esc), semantik `listbox`/`option`; tutup reset state. | ✅ |
 
 ---
 

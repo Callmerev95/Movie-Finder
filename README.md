@@ -8,6 +8,8 @@ browser. Tanpa akun, tanpa database, tanpa backend.
 - **Dua mode pencarian** — ketik judul (Search) atau pakai filter genre, tahun,
   provider streaming, dan Konten Indonesia (Discover). State pencarian tersimpan
   di URL: bisa dibagikan, tombol back bekerja.
+- **Command palette `⌘K`** — cari judul & lompat ke halaman dari mana saja;
+  full-keyboard, hasil mini dengan poster langsung ke detail.
 - **Detail lengkap** — poster, backdrop, sinopsis, trailer YouTube, pemeran,
   tempat menonton di Indonesia, link IMDb.
 - **Watchlist pribadi** — tambah/hapus (dengan undo), rating 1–5, tandai
@@ -57,7 +59,8 @@ error "API key TMDb belum diatur".
 
 ```
 src/
-├─ components/          SearchBar, Filters, ResultCard, Stars, TrendingSection
+├─ components/          SearchBar, Filters, ResultCard, Stars, TrendingSection,
+│  │                    CommandPalette (Cmd+K)
 │  └─ ui/               komponen shadcn — regenerate via CLI, jangan edit manual
 ├─ lib/                 pure functions: tmdb, watchlist, url-state, format,
 │  └─ *.test.ts         toast, useWatchlist (Context + localStorage)

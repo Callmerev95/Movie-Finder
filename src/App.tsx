@@ -10,6 +10,7 @@ import DetailPage from './pages/DetailPage'
 import PersonPage from './pages/PersonPage'
 import WatchlistPage from './pages/WatchlistPage'
 import { WatchlistProvider, useWatchlist } from '@/lib/useWatchlist'
+import { CommandPalette } from '@/components/CommandPalette'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -31,6 +32,7 @@ function Nav() {
           <span className="text-sm font-medium tracking-tight">Movie Finder</span>
         </Link>
         <div className="flex-1" />
+        <CommandPalette />
         <Button
           variant={onWatchlist ? 'secondary' : 'ghost'}
           size="sm"
