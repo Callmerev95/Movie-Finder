@@ -8,6 +8,8 @@ browser. Tanpa akun, tanpa database, tanpa backend.
 - **Dua mode pencarian** — ketik judul (Search) atau pakai filter genre, tahun,
   provider streaming, dan Konten Indonesia (Discover). State pencarian tersimpan
   di URL: bisa dibagikan, tombol back bekerja.
+- **PWA installable** — pasang ke home screen; app shell + poster ter-cache,
+  watchlist tetap berfungsi penuh saat offline.
 - **Command palette `⌘K`** — power-user shortcut: cari judul & lompat ke halaman
   dari mana saja; full-keyboard, hasil mini dengan poster langsung ke detail.
 - **Detail lengkap** — poster, backdrop, sinopsis, trailer YouTube, pemeran,
@@ -55,6 +57,7 @@ error "API key TMDb belum diatur".
 | Ikon / font | lucide-react / Geist Variable |
 | Test | Vitest |
 | Data | TMDb API v3 — watchlist di `localStorage` |
+| PWA | vite-plugin-pwa (Workbox precache + runtime cache TMDb) |
 
 ## Struktur
 
