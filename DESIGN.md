@@ -80,6 +80,24 @@ Detail page:
 - Alignment: kiri. Tidak ada center-aligned body.
 - Alignment poster grid: pertahankan rasio 2:3, `object-fit: cover`, width penuh kolom.
 
+### Section Grammar
+
+Setiap blok konten memakai pola yang sama (`src/components/Section.tsx`) — ciri
+visual yang membuat user tahu "ini section apa":
+
+- **Header**: judul `text-sm font-medium` + deskripsi muted `text-xs` opsional.
+  Deskripsi bukan hiasan — ia menyebut isi blok ("Pemeran dalam {judul}.",
+  "Ketersediaan streaming di Indonesia."). Judul tanpa deskripsi hanya untuk
+  blok yang sudah jelas (mis. Sinopsis).
+- **Ritme dua tingkat**: `mt-10` antar section besar (dipisah garis), `mt-6`
+  antar section berdekatan tanpa garis. Gap antar-grup ≥ 2× gap dalam-grup.
+- **Divider hairline**: `border-t border-border` (putih 10%) + `pt-8` menandai
+  section besar berikutnya. Satu jenis pembatas saja — bukan kartu, bukan
+  kotak `bg-card`, bukan eyebrow uppercase, bukan ikon per section.
+- **Konsistensi**: semua halaman memakai komponen yang sama (Detail, Person,
+  Watchlist, Trending). Section baru wajib lewat `Section`, jangan menulis
+  `<section>` + `<h2>` manual.
+
 ## 5. States & Interaksi
 
 | State | Perlakuan |
@@ -124,4 +142,5 @@ Detail page:
 - [ ] `loading="lazy"` + `decoding="async"` semua poster di bawah fold
 - [ ] Slot tinggi tetap utk poster (nol CLS)
 - [ ] Empty/error state memakai copy §5
+- [ ] Section baru memakai komponen `Section` (§4 Section Grammar)
 - [ ] Lighthouse: Perf >= 90, A11y >= 95 (PRD success criteria)

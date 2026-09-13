@@ -251,6 +251,10 @@ satu-satunya elemen hidup. Lihat `DESIGN.md` untuk spesifikasi penuh
 aksesibilitas). Ringkasan kunci:
 
 - Dark-only: `.dark` permanen di `<html>`, tanpa toggle tema.
+- **Section Grammar**: semua blok konten memakai komponen `Section` — judul +
+  deskripsi muted sebagai ciri blok, ritme dua tingkat (`mt-10` antar section
+  besar / `mt-6` antar section berdekatan), divider hairline antar section
+  besar. Konsisten lintas halaman (Detail, Person, Watchlist, Trending).
 - Motion hanya menjawab aksi user; nol entrance animation grid; hormati
   `prefers-reduced-motion`.
 - Semua kontrol keyboard-reachable; fokus ring terlihat; icon-only button

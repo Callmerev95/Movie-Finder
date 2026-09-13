@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Stars } from '@/components/Stars'
 import { ResultCard } from '@/components/ResultCard'
+import { Section } from '@/components/Section'
 import { detail, imageUrl, recommendations, TmdbError } from '@/lib/tmdb'
 import { detailInfoRows } from '@/lib/detail-info'
 import type { DetailData, Item } from '@/lib/types'
@@ -184,18 +185,16 @@ export default function DetailPage() {
           </div>
 
           {data.overview && (
-            <section className="mt-6">
-              <h2 className="sr-only">Sinopsis</h2>
+            <Section title="Sinopsis">
               <p className="max-w-prose text-sm leading-relaxed text-card-foreground/90">{data.overview}</p>
-            </section>
+            </Section>
           )}
 
           {(() => {
             const rows = detailInfoRows(data)
             return rows.length > 0 ? (
-              <section className="mt-6">
-                <h2 className="text-sm font-medium">Informasi</h2>
-                <dl className="mt-3 flex flex-col gap-2">
+              <Section title="Informasi" description="Fakta teknis dan detail produksi." divider className="mt-10">
+                <dl className="flex flex-col gap-2">
                   {rows.map(([label, value]) => (
                     <div key={label} className="flex flex-wrap gap-x-3">
                       <dt className="w-32 shrink-0 text-xs text-muted-foreground">{label}</dt>
@@ -215,14 +214,13 @@ export default function DetailPage() {
                     <ExternalLink className="size-3" aria-hidden="true" />
                   </a>
                 )}
-              </section>
+              </Section>
             ) : null
           })()}
 
           {data.providers && (
-            <section className="mt-6">
-              <h2 className="text-sm font-medium">Tempat menonton (Indonesia)</h2>
-              <dl className="mt-3 flex flex-col gap-3">
+            <Section title="Tempat menonton" description="Ketersediaan streaming di Indonesia." divider className="mt-10">
+              <dl className="flex flex-col gap-3">
                 {(
                   [
                     ['Langganan', data.providers.flatrate],
@@ -257,13 +255,12 @@ export default function DetailPage() {
                     ),
                 )}
               </dl>
-            </section>
+            </Section>
           )}
 
           {data.trailerKey && (
-            <section className="mt-6">
-              <h2 className="text-sm font-medium">Trailer</h2>
-              <div className="mt-2 aspect-video w-full max-w-xl overflow-hidden rounded-lg border border-border">
+            <Section title="Trailer" description={`Cuplikan resmi ${data.title}.`} divider className="mt-10">
+              <div className="aspect-video w-full max-w-xl overflow-hidden rounded-lg border border-border">
                 <iframe
                   src={`https://www.youtube-nocookie.com/embed/${data.trailerKey}`}
                   title={`Trailer ${data.title}`}
@@ -272,13 +269,12 @@ export default function DetailPage() {
                   className="size-full"
                 />
               </div>
-            </section>
+            </Section>
           )}
 
           {data.cast.length > 0 && (
-            <section className="mt-6">
-              <h2 className="text-sm font-medium">Pemain utama</h2>
-              <ul className="mt-3 flex flex-wrap gap-4">
+            <Section title="Pemain utama" description={`Pemeran dalam ${data.title}.`} divider className="mt-10">
+              <ul className="flex flex-wrap gap-4">
                 {data.cast.map((c) => (
                   <li key={c.id}>
                     <Link
@@ -312,18 +308,22 @@ export default function DetailPage() {
                   </li>
                 ))}
               </ul>
-            </section>
+            </Section>
           )}
 
           {related.length > 0 && (
-            <section className="mt-8">
-              <h2 className="text-sm font-medium">Mungkin kamu suka</h2>
-              <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            <Section
+              title="Mungkin kamu suka"
+              description="Film dan serial serupa berdasarkan skor TMDb."
+              divider
+              className="mt-10"
+            >
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
                 {related.map((item) => (
                   <ResultCard key={`${item.type}-${item.tmdbId}`} item={item} />
                 ))}
               </div>
-            </section>
+            </Section>
           )}
         </div>
       </div>

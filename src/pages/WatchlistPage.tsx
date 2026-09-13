@@ -76,6 +76,9 @@ export default function WatchlistPage() {
   return (
     <div className="pt-6">
       <h1 className="text-2xl font-medium tracking-tight">Watchlist</h1>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Daftar tontonan pribadi — tersimpan di browser ini.
+      </p>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Urutkan watchlist">
           {SORTS.map((s) => (

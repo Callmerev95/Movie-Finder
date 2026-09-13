@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, Calendar, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ResultCard } from '@/components/ResultCard'
+import { Section } from '@/components/Section'
 import { person, TmdbError } from '@/lib/tmdb'
 import type { PersonDetail } from '@/lib/types'
 
@@ -96,25 +97,23 @@ export default function PersonPage() {
           )}
 
           {data.biography && (
-            <section className="mt-6">
-              <h2 className="sr-only">Biografi</h2>
+            <Section title="Biografi" className="mt-6">
               <p className="max-w-prose whitespace-pre-line text-sm leading-relaxed text-card-foreground/90">
                 {data.biography}
               </p>
-            </section>
+            </Section>
           )}
 
           {data.credits.length > 0 && (
-            <section className="mt-6">
-              <h2 className="text-sm font-medium">Paling dikenal dari</h2>
-              <ul className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+            <Section title="Paling dikenal dari" description="Film dan serial dengan skor TMDb tertinggi." className="mt-6">
+              <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
                 {data.credits.map((item) => (
                   <li key={`${item.type}-${item.tmdbId}`}>
                     <ResultCard item={item} />
                   </li>
                 ))}
               </ul>
-            </section>
+            </Section>
           )}
         </div>
       </div>

@@ -59,8 +59,8 @@ error "API key TMDb belum diatur".
 
 ```
 src/
-├─ components/          SearchBar, Filters, ResultCard, Stars, TrendingSection,
-│  │                    CommandPalette (Cmd+K)
+├─ components/          SearchBar, Filters, ResultCard, Stars, Section,
+│  │                    TrendingSection, CommandPalette (Cmd+K)
 │  └─ ui/               komponen shadcn — regenerate via CLI, jangan edit manual
 ├─ lib/                 pure functions: tmdb, watchlist, url-state, format,
 │  └─ *.test.ts         toast, useWatchlist (Context + localStorage)
