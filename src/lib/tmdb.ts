@@ -315,3 +315,14 @@ export function imageUrl(path: string | null, size = 'w342'): string | null {
   if (!path) return null
   return `https://image.tmdb.org/t/p/${size}${path}`
 }
+
+// provider TMDb tak punya homepage di API → arahkan ke katalog JustWatch region ID
+export function providerUrl(name: string): string {
+  const slug = name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+  return `https://www.justwatch.com/id/provider/${slug}`
+}

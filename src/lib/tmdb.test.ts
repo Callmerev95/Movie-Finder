@@ -164,6 +164,16 @@ describe('trending', () => {
   })
 })
 
+describe('providerUrl', () => {
+  it('slug JustWatch region ID dari nama provider', async () => {
+    const { providerUrl } = await import('./tmdb')
+    expect(providerUrl('Netflix')).toBe('https://www.justwatch.com/id/provider/netflix')
+    expect(providerUrl('Amazon Prime Video')).toBe('https://www.justwatch.com/id/provider/amazon-prime-video')
+    expect(providerUrl('Apple TV')).toBe('https://www.justwatch.com/id/provider/apple-tv')
+    expect(providerUrl('Disney+')).toBe('https://www.justwatch.com/id/provider/disney')
+  })
+})
+
 describe('recommendations', () => {
   const mk = (n: number) =>
     Array.from({ length: n }, (_, i) => ({

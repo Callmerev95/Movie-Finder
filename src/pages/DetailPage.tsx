@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Stars } from '@/components/Stars'
 import { ResultCard } from '@/components/ResultCard'
 import { Section } from '@/components/Section'
-import { detail, imageUrl, recommendations, TmdbError } from '@/lib/tmdb'
+import { detail, imageUrl, providerUrl, recommendations, TmdbError } from '@/lib/tmdb'
 import { detailInfoRows } from '@/lib/detail-info'
 import type { DetailData, Item } from '@/lib/types'
 import { useWatchlist } from '@/lib/useWatchlist'
@@ -233,23 +233,31 @@ export default function DetailPage() {
                       <div key={label} className="flex flex-wrap items-center gap-x-3 gap-y-2">
                         <dt className="w-20 shrink-0 text-xs text-muted-foreground">{label}</dt>
                         <dd className="flex flex-wrap gap-2">
-                          {list.map((p) => (
-                            <span
-                              key={p.id}
-                              className="flex items-center gap-2 rounded-md border border-border/60 bg-card/80 py-1 pe-2.5 ps-1.5 text-xs text-card-foreground"
-                            >
-                              {p.logoPath ? (
-                                <img
-                                  src={imageUrl(p.logoPath, 'w92') ?? ''}
-                                  alt=""
-                                  loading="lazy"
-                                  decoding="async"
-                                  className="h-5 w-auto rounded-sm"
-                                />
-                              ) : null}
-                              {p.name}
-                            </span>
-                          ))}
+                          {list.map((p) => {
+                            const href = providerUrl(p.name)
+                            return (
+                              <a
+                                key={p.id}
+                                href={href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={`Buka ${p.name} di tab baru`}
+                                className="flex cursor-pointer items-center gap-2 rounded-md border border-border/60 bg-card/80 py-1 pe-2.5 ps-1.5 text-xs text-card-foreground outline-none transition-colors hover:border-foreground/20 focus-visible:ring-3 focus-visible:ring-ring/50"
+                              >
+                                {p.logoPath ? (
+                                  <img
+                                    src={imageUrl(p.logoPath, 'w92') ?? ''}
+                                    alt=""
+                                    loading="lazy"
+                                    decoding="async"
+                                    className="h-5 w-auto rounded-sm"
+                                  />
+                                ) : null}
+                                {p.name}
+                                <ExternalLink className="size-3 text-muted-foreground" aria-hidden="true" />
+                              </a>
+                            )
+                          })}
                         </dd>
                       </div>
                     ),

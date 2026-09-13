@@ -11,6 +11,9 @@ import { parseUrlState, serializeUrlState } from '@/lib/url-state'
 import { toastInfo } from '@/lib/toast'
 import type { Item, MediaType } from '@/lib/types'
 
+const PAGE = 20
+const INITIAL = 24
+
 export default function SearchPage() {
   const [, setParams] = useSearchParams()
   const { search } = useLocation()
@@ -20,6 +23,7 @@ export default function SearchPage() {
   const state = useMemo(() => parseUrlState(new URLSearchParams(search)), [search])
 
   const [items, setItems] = useState<Item[]>([])
+  const [visible, setVisible] = useState(INITIAL)
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -36,13 +40,21 @@ export default function SearchPage() {
       setLoading(true)
       setError(null)
       setItems([])
+      setVisible(INITIAL)
       pagesLoaded.current = 0
       try {
-        const r = mode === 'search' ? await searchByTitle(query, 1) : await discover(filters, type, 1)
+        // 24 awal = 20 dari halaman 1 + 4 prefetch halaman 2
+        const first = mode === 'search' ? await searchByTitle(query, 1) : await discover(filters, type, 1)
         if (signal.aborted) return
-        setItems(r.items)
-        setTotal(r.total)
+        setItems(first.items)
+        setTotal(first.total)
         pagesLoaded.current = 1
+        if (first.items.length < INITIAL && first.page < first.totalPages) {
+          const second = mode === 'search' ? await searchByTitle(query, 2) : await discover(filters, type, 2)
+          if (signal.aborted) return
+          setItems((prev) => [...prev, ...second.items])
+          pagesLoaded.current = 2
+        }
       } catch (e) {
         if (signal.aborted) return
         setError(e instanceof TmdbError ? e.message : 'Terjadi kesalahan tak terduga.')
@@ -62,11 +74,17 @@ export default function SearchPage() {
 
   const loadMore = async () => {
     if (loadingMore) return
+    // masih ada item ter-fetch yang belum tampil → cukup reveal, tanpa request
+    if (items.length > visible) {
+      setVisible((v) => v + PAGE)
+      return
+    }
     setLoadingMore(true)
     try {
       const next = pagesLoaded.current + 1
       const r = mode === 'search' ? await searchByTitle(query, next) : await discover(filters, type, next)
       setItems((prev) => [...prev, ...r.items])
+      setVisible((v) => v + PAGE)
       pagesLoaded.current = next
     } catch (e) {
       setError(e instanceof TmdbError ? e.message : 'Gagal memuat halaman berikutnya.')
@@ -148,7 +166,7 @@ export default function SearchPage() {
             {total.toLocaleString('id-ID')} hasil
           </p>
           <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-            {items.map((item) => (
+            {items.slice(0, visible).map((item) => (
               <ResultCard key={`${item.type}-${item.tmdbId}`} item={item} />
             ))}
           </div>

@@ -111,9 +111,9 @@ keputusan arsitektur di `docs/adr/`.
 
 | ID | Fitur | Acceptance Criteria | Status |
 |---|---|---|---|
-| US-1 | **Search by judul** | Debounce 300ms; hasil pertama < 1.5s; hasil `person` dibuang; tampil poster, judul, tahun, Skor TMDb, badge type (Film/Serial); pagination 20/halaman. Endpoint `/search/multi`. | ✅ |
+| US-1 | **Search by judul** | Debounce 300ms; hasil pertama < 1.5s; hasil `person` dibuang; tampil poster, judul, tahun, Skor TMDb, badge type (Film/Serial); 24 item awal (halaman 1 + prefetch 4 dari halaman 2), lalu +20 per "Muat lebih banyak". Endpoint `/search/multi`. | ✅ |
 | US-2 | **Discover / filter** | Filter genre multi-select + rentang tahun (Dari/Sampai) + provider streaming single-select (region ID) + toggle Konten Indonesia + toggle adult (default OFF); type default Film dengan toggle Serial; genre list per-type dan reset saat ganti type; konten Indonesia sort terbaru dulu + cap tanggal hari ini; submit teks saat filter aktif → switch ke Search + clear filter + toast; state filter tersimpan di URL. Lihat ADR 0001. | ✅ |
-| US-3 | **Detail item** | Poster besar + backdrop, tagline, sinopsis, genre, durasi (Film) / jumlah season+episode (Serial), Skor TMDb, status tayang, cast utama (10), sutradara/pencipta/studio/jaringan, embed trailer YouTube (preferensi Trailer official → Teaser), link IMDb, tempat menonton per region Indonesia (Langganan/Sewa/Beli; sembunyikan bila kosong — ADR 0002). Endpoint dispatch `/movie/{id}` vs `/tv/{id}`. | ✅ |
+| US-3 | **Detail item** | Poster besar + backdrop, tagline, sinopsis, genre, durasi (Film) / jumlah season+episode (Serial), Skor TMDb, status tayang, cast utama (10, dengan foto), sutradara/pencipta/studio/jaringan, embed trailer YouTube (preferensi Trailer official → Teaser), link IMDb, tempat menonton per region Indonesia (Langganan/Sewa/Beli; tiap provider bisa diklik ke katalog JustWatch region ID; sembunyikan bila kosong — ADR 0002). Endpoint dispatch `/movie/{id}` vs `/tv/{id}`. | ✅ |
 | US-4 | **Simpan ke watchlist** | Tombol add/remove dari hasil & detail; persisten setelah refresh; badge jumlah item di navigasi; hapus menampilkan toast dengan undo (kembalikan snapshot persis). | ✅ |
 | US-5 | **Rating 1–5** | Rating di detail otomatis add item ke watchlist + set rating dalam satu langkah; di watchlist bisa edit/clear; klik bintang sama = clear; persisten. | ✅ |
 | US-6 | **Kelola watchlist** | Sort by tanggal ditambah (default) / rating / judul; hapus item; ekspor/impor JSON (merge anti-duplikat, item existing menang; validasi `parseWatchlist`; file korup → pesan error); empty state jelas. | ✅ |
@@ -268,7 +268,7 @@ aksesibilitas). Ringkasan kunci:
 | Perintah | Fungsi | Status |
 |---|---|---|
 | `npm run typecheck` | `tsc --noEmit`, wajib hijau | ✅ 0 error |
-| `npm test` | Vitest, pure functions di `src/lib/` | ✅ 52/52 |
+| `npm test` | Vitest, pure functions di `src/lib/` | ✅ 53/53 |
 | `npm run build` | Produksi build | ✅ hijau |
 | `npm run dev` | Dev server | — |
 
