@@ -6,7 +6,8 @@
 | Status | MVP + v1.1 **selesai di-build** |
 | Owner | rev |
 | Repo | `Callmerev95/Movie-Finder` (public) |
-| Dokumen terkait | `DESIGN.md` (desain), `CONTEXT.md` (glossary), `docs/adr/` (keputusan arsitektur) |
+| Dokumen terkait | `DESIGN.md` (desain), `CONTEXT.md` (glossary, lokal saja), `docs/adr/` (keputusan arsitektur, lokal saja) |
+| Produksi | https://movie-finder.callmerev.my.id |
 
 ---
 
@@ -107,7 +108,7 @@ flowchart TD
 ## 5. Fitur & User Stories
 
 Semua fitur berikut **sudah diimplementasikan** (status ✅). `ADR` merujuk
-keputusan arsitektur di `docs/adr/`.
+keputusan arsitektur di `docs/adr/` (lokal, tidak di-push).
 
 | ID | Fitur | Acceptance Criteria | Status |
 |---|---|---|---|
@@ -321,7 +322,7 @@ build pada setiap push ke `main` dan setiap pull request. Badge status di
 
 ```
 Movie-Finder/
-├─ public/
+├─ public/                 (favicon, ikon PWA, og-image.png, robots.txt, sitemap.xml)
 ├─ src/
 │  ├─ assets/              (logo TMDb)
 │  ├─ components/
@@ -350,7 +351,7 @@ Movie-Finder/
 │  ├─ App.tsx              (router + nav + footer)
 │  ├─ main.tsx
 │  └─ index.css            (token cinema dark, dark-only)
-├─ docs/adr/               (0001 dual-mode search, 0002 where-to-watch)
+├─ index.html              (meta SEO: OG/Twitter, canonical, JSON-LD)
 ├─ .env.example            (VITE_TMDB_API_KEY=)
 ├─ package.json
 ├─ tsconfig.json
@@ -364,7 +365,10 @@ Movie-Finder/
 - **Glossary**: `CONTEXT.md` — istilah kanonik (Watchlist, Rating, Ditonton,
   Skor TMDb, Item, Film, Serial, Mode Pencarian, Search, Discover, Filter,
   Type, Tahun, Trending, Provider Streaming, Konten Indonesia, Orang).
+  **Lokal saja**, tidak di-push ke repo.
 - **ADR**: `docs/adr/0001-dual-mode-search.md`,
-  `docs/adr/0002-where-to-watch.md`.
+  `docs/adr/0002-where-to-watch.md`. **Lokal saja**, tidak di-push ke repo.
+- **Produksi**: https://movie-finder.callmerev.my.id — portfolio:
+  https://callmerev.my.id.
 - **Penyiapan awal** (sekali): isi `VITE_TMDB_API_KEY` di `.env.local` (lokal)
   dan environment variable Vercel (produksi).

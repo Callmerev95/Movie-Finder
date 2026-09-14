@@ -85,12 +85,18 @@ functions — komponen hanya render + memanggil hook. Detail arsitektur di
 
 ## Deploy (Vercel)
 
-Repo ini siap deploy static di Vercel — SPA rewrite sudah dikonfigurasi
+Produksi: **https://movie-finder.callmerev.my.id**
+
+Repo ini deploy static di Vercel — SPA rewrite sudah dikonfigurasi
 (`vercel.json`).
 
 1. Import repo di Vercel, framework terdeteksi otomatis (Vite).
 2. Set environment variable `VITE_TMDB_API_KEY`.
-3. Deploy.
+3. Deploy, lalu hubungkan domain kustom di Production Domains.
+
+Meta SEO sudah statis tanpa backend: Open Graph + Twitter Card + canonical +
+JSON-LD di `index.html`, plus `robots.txt`, `sitemap.xml`, dan `og-image.png`
+di `public/`.
 
 ## Dokumen
 
@@ -98,8 +104,8 @@ Repo ini siap deploy static di Vercel — SPA rewrite sudah dikonfigurasi
 |---|---|
 | [`PRD.md`](PRD.md) | Kebutuhan, user stories, arsitektur, roadmap |
 | [`DESIGN.md`](DESIGN.md) | Arah visual "Cinema Quiet", token, states, a11y |
-| [`CONTEXT.md`](CONTEXT.md) | Glossary istilah kanonik |
-| `docs/adr/` | Keputusan arsitektur (0001 dual-mode search, 0002 where-to-watch) |
+| `CONTEXT.md` | Glossary istilah kanonik — lokal saja, tidak di-push |
+| `docs/adr/` | Keputusan arsitektur 0001 & 0002 — lokal saja, tidak di-push |
 
 ## Catatan
 
