@@ -164,13 +164,17 @@ export default function SearchPage() {
 
       {items.length > 0 && (
         <>
-          <p className="mt-6 text-xs text-muted-foreground tabular-nums" aria-live="polite">
-            {t('search.results', { total: total.toLocaleString(locale) })}
-          </p>
-          <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-            {items.slice(0, visible).map((item) => (
-              <ResultCard key={`${item.type}-${item.tmdbId}`} item={item} />
-            ))}
+          <div className="mt-6">
+            {mode === 'search' && query && (
+              <p className="mb-3 text-xs text-muted-foreground tabular-nums" aria-live="polite">
+                {t('search.results', { total: total.toLocaleString(locale) })}
+              </p>
+            )}
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+              {items.slice(0, visible).map((item) => (
+                <ResultCard key={`${item.type}-${item.tmdbId}`} item={item} />
+              ))}
+            </div>
           </div>
           {items.length < total && (
             <div className="mt-8 flex justify-center">
