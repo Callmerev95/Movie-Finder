@@ -82,7 +82,7 @@ function LangToggle() {
         if (v === 'id' || v === 'en') setLang(v)
       }}
     >
-      <SelectTrigger size="sm" aria-label={t('footer.language')} className="text-xs text-muted-foreground">
+      <SelectTrigger size="sm" aria-label={t('footer.language')} className="text-xs text-foreground">
         <Languages className="size-3.5" aria-hidden="true" />
         <span>{lang === 'id' ? 'Indonesia' : 'English'}</span>
       </SelectTrigger>
@@ -111,18 +111,18 @@ export default function App() {
           </Routes>
         </main>
         <footer className="border-t border-border">
-          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-6">
-            <p className="text-xs text-muted-foreground">© 2026 Movie Finder</p>
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-6">
             <div className="flex items-center gap-3">
-              <LangToggle />
+              <p className="text-xs text-muted-foreground">© 2026 Movie Finder</p>
               <a
                 href="https://www.themoviedb.org/"
                 className="inline-flex items-center rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
                 aria-label="The Movie Database (TMDb)"
               >
-                <img src={tmdbLogo} alt="" width={91} height={7} className="h-6 w-auto" />
+                <img src={tmdbLogo} alt="" width={91} height={7} className="h-3.5 w-auto" />
               </a>
             </div>
+            <LangToggle />
           </div>
         </footer>
         <Toaster />
