@@ -23,6 +23,20 @@ function ScrollToTop() {
   return null
 }
 
+const PAGE_TITLES: Record<string, string> = {
+  '/': 'Movie Finder — Cari film & serial, simpan watchlist',
+  '/watchlist': 'Watchlist — Movie Finder',
+  '/stats': 'Statistik Watchlist — Movie Finder',
+}
+
+function PageTitle() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    document.title = PAGE_TITLES[pathname] ?? 'Movie Finder — Cari film & serial, simpan watchlist'
+  }, [pathname])
+  return null
+}
+
 function Nav() {
   const { entries } = useWatchlist()
   const { t } = useLanguage()
@@ -85,6 +99,7 @@ export default function App() {
     <LanguageProvider>
       <WatchlistProvider>
         <ScrollToTop />
+        <PageTitle />
         <Nav />
         <main className="mx-auto max-w-6xl px-4 pb-10">
           <Routes>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://movie-finder.callmerev.my.id/sitemap.xml
