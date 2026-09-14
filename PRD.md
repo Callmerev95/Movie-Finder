@@ -6,7 +6,7 @@
 | Status | MVP + v1.1 **selesai di-build** |
 | Owner | rev |
 | Repo | `Callmerev95/Movie-Finder` (public) |
-| Dokumen terkait | `DESIGN.md` (desain), `CONTEXT.md` (glossary, lokal saja), `docs/adr/` (keputusan arsitektur, lokal saja) |
+| Dokumen terkait | `DESIGN.md` (desain), `README.md` (mulai & deploy) |
 | Produksi | https://movie-finder.callmerev.my.id |
 
 ---
@@ -107,14 +107,13 @@ flowchart TD
 
 ## 5. Fitur & User Stories
 
-Semua fitur berikut **sudah diimplementasikan** (status ✅). `ADR` merujuk
-keputusan arsitektur di `docs/adr/` (lokal, tidak di-push).
+Semua fitur berikut **sudah diimplementasikan** (status ✅).
 
 | ID | Fitur | Acceptance Criteria | Status |
 |---|---|---|---|
 | US-1 | **Search by judul** | Debounce 300ms; hasil pertama < 1.5s; hasil `person` dibuang; tampil poster, judul, tahun, Skor TMDb, badge type (Film/Serial); 24 item awal (halaman 1 + prefetch 4 dari halaman 2), lalu +20 per "Muat lebih banyak". Endpoint `/search/multi`. | ✅ |
-| US-2 | **Discover / filter** | Filter genre multi-select + rentang tahun (Dari/Sampai) + provider streaming single-select (region ID) + toggle Konten Indonesia + toggle adult (default OFF); type default Film dengan toggle Serial; genre list per-type dan reset saat ganti type; konten Indonesia sort terbaru dulu + cap tanggal hari ini; submit teks saat filter aktif → switch ke Search + clear filter + toast; state filter tersimpan di URL. Lihat ADR 0001. | ✅ |
-| US-3 | **Detail item** | Poster besar + backdrop, tagline, sinopsis, genre, durasi (Film) / jumlah season+episode (Serial), Skor TMDb, status tayang, cast utama (10, dengan foto), sutradara/pencipta/studio/jaringan, embed trailer YouTube (preferensi Trailer official → Teaser), link IMDb, tempat menonton per region Indonesia (Langganan/Sewa/Beli; tiap provider bisa diklik ke katalog JustWatch region ID; sembunyikan bila kosong — ADR 0002). Endpoint dispatch `/movie/{id}` vs `/tv/{id}`. | ✅ |
+| US-2 | **Discover / filter** | Filter genre multi-select + rentang tahun (Dari/Sampai) + provider streaming single-select (region ID) + toggle Konten Indonesia + toggle adult (default OFF); type default Film dengan toggle Serial; genre list per-type dan reset saat ganti type; konten Indonesia sort terbaru dulu + cap tanggal hari ini; submit teks saat filter aktif → switch ke Search + clear filter + toast; state filter tersimpan di URL. | ✅ |
+| US-3 | **Detail item** | Poster besar + backdrop, tagline, sinopsis, genre, durasi (Film) / jumlah season+episode (Serial), Skor TMDb, status tayang, cast utama (10, dengan foto), sutradara/pencipta/studio/jaringan, embed trailer YouTube (preferensi Trailer official → Teaser), link IMDb, tempat menonton per region Indonesia (Langganan/Sewa/Beli; tiap provider bisa diklik ke katalog JustWatch region ID; sembunyikan bila kosong). Endpoint dispatch `/movie/{id}` vs `/tv/{id}`. | ✅ |
 | US-4 | **Simpan ke watchlist** | Tombol add/remove dari hasil & detail; persisten setelah refresh; badge jumlah item di navigasi; hapus menampilkan toast dengan undo (kembalikan snapshot persis). | ✅ |
 | US-5 | **Rating 1–5** | Rating di detail otomatis add item ke watchlist + set rating dalam satu langkah; di watchlist bisa edit/clear; klik bintang sama = clear; persisten. | ✅ |
 | US-6 | **Kelola watchlist** | Sort by tanggal ditambah (default) / rating / judul; hapus item; ekspor/impor JSON (merge anti-duplikat, item existing menang; validasi `parseWatchlist`; file korup → pesan error); empty state jelas. | ✅ |
@@ -208,7 +207,7 @@ Nol logika bisnis di komponen.
 | Fungsi | Endpoint | Catatan |
 |---|---|---|
 | Search teks | `/search/multi` | `include_adult=false` |
-| Discover | `/discover/movie` / `/discover/tv` | param dilihat di ADR 0001 |
+| Discover | `/discover/movie` / `/discover/tv` | param URL di §7.4 |
 | Genre list | `/genre/movie/list` / `/genre/tv/list` | ID genre beda per type |
 | Detail | `/movie/{id}` / `/tv/{id}` | `append_to_response=videos,credits,watch/providers`, `include_video_language=id,en,null` |
 | Rekomendasi | `/movie/{id}/recommendations` / `/tv/{id}/recommendations` | fallback `/similar` |
@@ -243,7 +242,7 @@ yang ramah. Region provider hardcoded `ID`.
 - API key: `import.meta.env.VITE_TMDB_API_KEY` — **jangan hardcode, jangan
   commit `.env`**. Variabel diisi di `.env.local` (lokal) dan environment
   variable Vercel (produksi).
-- Key ada di client by design (ADR 0001): key TMDb gratis & dapat diganti.
+- Key ada di client by design: key TMDb gratis & dapat diganti.
 
 ---
 
@@ -362,12 +361,6 @@ Movie-Finder/
 
 ## 14. Lampiran
 
-- **Glossary**: `CONTEXT.md` — istilah kanonik (Watchlist, Rating, Ditonton,
-  Skor TMDb, Item, Film, Serial, Mode Pencarian, Search, Discover, Filter,
-  Type, Tahun, Trending, Provider Streaming, Konten Indonesia, Orang).
-  **Lokal saja**, tidak di-push ke repo.
-- **ADR**: `docs/adr/0001-dual-mode-search.md`,
-  `docs/adr/0002-where-to-watch.md`. **Lokal saja**, tidak di-push ke repo.
 - **Produksi**: https://movie-finder.callmerev.my.id — portfolio:
   https://callmerev.my.id.
 - **Penyiapan awal** (sekali): isi `VITE_TMDB_API_KEY` di `.env.local` (lokal)
