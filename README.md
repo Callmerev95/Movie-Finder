@@ -104,15 +104,13 @@ di `public/`.
 |---|---|
 | [`PRD.md`](PRD.md) | Kebutuhan, user stories, arsitektur, roadmap |
 | [`DESIGN.md`](DESIGN.md) | Arah visual "Cinema Quiet", token, states, a11y |
-| `CONTEXT.md` | Glossary istilah kanonik — lokal saja, tidak di-push |
-| `docs/adr/` | Keputusan arsitektur 0001 & 0002 — lokal saja, tidak di-push |
 
 ## Catatan
 
 - Watchlist tersimpan di `localStorage` (key `movie-finder:watchlist`) — tidak
   sinkron antar perangkat; hapus data browser = hilang. Pakai ekspor/impor JSON
   untuk cadangan atau pindah perangkat.
-- API key client-side by design — key TMDb gratis & replaceable (ADR 0001).
+- API key client-side by design — key TMDb gratis & replaceable.
 - Data & logo TMDb © masing-masing pemilik — atribusi di footer aplikasi.
 
 ## Lisensi
