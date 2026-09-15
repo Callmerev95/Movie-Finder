@@ -113,7 +113,17 @@ export default function App() {
         <footer className="border-t border-border">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-6">
             <div className="flex items-center gap-3">
-              <p className="text-xs text-muted-foreground">© 2026 Movie Finder</p>
+              <p className="text-xs text-muted-foreground">
+                © 2026 Movie Finder <span aria-hidden="true">·</span> Develop by{' '}
+                <a
+                  href="https://callmerev.my.id"
+                  target="_blank"
+                  rel="noopener"
+                  className="rounded-sm text-foreground underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  Callmerev
+                </a>
+              </p>
               <a
                 href="https://www.themoviedb.org/"
                 className="inline-flex items-center rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
